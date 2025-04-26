@@ -21,7 +21,6 @@
         height: 100vh;
         width: 100%;
       }
-      
       /* Notifications Container (top-right) */
       #notificationContainer {
         position: fixed;
@@ -44,7 +43,6 @@
       .notification.error {
         background-color: #f44336;
       }
-      
       /* Authentication UI Overlay */
       #auth-container {
         position: fixed;
@@ -84,7 +82,6 @@
         text-decoration: underline;
         cursor: pointer;
       }
-      
       /* Left Side Menu for Pin List */
       #pinListMenu {
         position: absolute;
@@ -99,7 +96,6 @@
         padding: 5px;
         font-size: 14px;
       }
-      
       /* Search Container & Results */
       #searchContainer {
         position: absolute;
@@ -131,7 +127,6 @@
       #searchResults li:hover {
         background: #f0f0f0;
       }
-      
       /* Layer Selection Container (top-center) */
       #layerSelectContainer {
         position: absolute;
@@ -154,7 +149,6 @@
         cursor: pointer;
         margin-right: 5px;
       }
-      
       /* Modal for Custom Pin Form */
       #pinFormModal {
         display: none;
@@ -184,7 +178,6 @@
         margin-bottom: 10px;
         box-sizing: border-box;
       }
-      
       /* Icon Custom Options Layout */
       #iconCustomOptions {
         display: flex;
@@ -237,7 +230,6 @@
       .selected {
         border-color: orange !important;
       }
-      
       /* Enhanced Marker styles for map icons */
       .custom-marker {
         font-size: 10px;
@@ -251,7 +243,6 @@
         transform: scale(1.2);
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       }
-      
       /* Tooltip styling */
       .custom-tooltip {
         background: rgba(0,0,0,0.8);
@@ -260,7 +251,6 @@
         border-radius: 3px;
         font-size: 12px;
       }
-      
       /* Context Menu Styling */
       .custom-context-menu {
         text-align: center;
@@ -386,7 +376,7 @@
       };
       firebase.initializeApp(firebaseConfig);
 
-      /**************** Notification Function ******************/
+      // Notification function
       function showNotification(message, type) {
         var container = document.getElementById("notificationContainer");
         var notif = document.createElement("div");
@@ -401,7 +391,7 @@
         }, 3000);
       }
 
-      /**************** Authentication UI Handlers ******************/
+      // Authentication UI Handlers
       const signInForm = document.getElementById("signInForm");
       const signUpForm = document.getElementById("signUpForm");
       const signInContainer = document.getElementById("signInContainer");
@@ -457,7 +447,7 @@
         }
       });
 
-      /**************** Main App: Initialization (Mapping & Realtime Database) ******************/
+      // Main App Initialization – Mapping & Realtime Database
       function initMapAndRealtime() {
         var map = L.map("map", {
           center: [45.541, 10.211],
@@ -467,7 +457,7 @@
           attribution: "Map data © OpenStreetMap contributors"
         });
         baseLayer.addTo(map);
-        // Optional: Remove demo marker if not needed.
+        // Remove demo marker if not needed.
         // var demoMarker = L.marker([45.541, 10.211]).addTo(map).bindPopup("Welcome!").openPopup();
 
         var vehicleLayer = L.markerClusterGroup();
@@ -476,17 +466,17 @@
         customPinLayer.addTo(map);
         L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
 
-        /***** Define clearCustomPinMarkers Function *****/
+        // Define clearCustomPinMarkers function.
         function clearCustomPinMarkers() {
           customPinLayer.clearLayers();
           customPinMarkers = {};
         }
 
-        /***** Firebase Realtime Database Integration for Pin Layers *****/
-        var pinLayers = [];           // Array for all layers
-        var activePinLayerId = null;
-        var activePinLayer = null;
-        var customPins = [];          // Initialize to an empty array
+        // Firebase Realtime Database: Pin Layers
+        var pinLayers = [];           // all layers
+        var activePinLayerId = null;  // id of active layer
+        var activePinLayer = null;    // active layer object
+        var customPins = [];          // pins of the active layer
 
         function savePinLayersToDatabase() {
           firebase.database().ref("globalMapPinLayers").set(pinLayers, function(error) {
@@ -515,7 +505,7 @@
             activePinLayer = pinLayers.find(function(layer) {
               return layer.id === activePinLayerId;
             }) || pinLayers[0];
-            // Default to an empty array if pins is not defined.
+            // Ensure that pins is always an array.
             customPins = activePinLayer.pins || [];
             clearCustomPinMarkers();
             loadPinsToMap();
@@ -525,7 +515,7 @@
         }
         loadPinLayersFromDatabase();
 
-        /***** UI for Layer Selection & Management *****/
+        // UI for Layer Selection & Management
         function updateLayerSelectMenu() {
           var select = document.getElementById("pinLayerSelect");
           select.innerHTML = "";
@@ -581,8 +571,9 @@
           }
         });
 
+        // Adjusted Export (Sačuvaj) function – export only the pins array wrapped in an object.
         document.getElementById("exportLayerBtn").addEventListener("click", function() {
-          var dataStr = JSON.stringify(activePinLayer, null, 4);
+          var dataStr = JSON.stringify({ pins: activePinLayer.pins }, null, 4);
           var blob = new Blob([dataStr], { type: "application/json" });
           var url = URL.createObjectURL(blob);
           var a = document.createElement("a");
@@ -594,6 +585,7 @@
           URL.revokeObjectURL(url);
         });
 
+        // Import (Dodaj) function remains compatible.
         document.getElementById("importLayerBtn").addEventListener("click", function() {
           document.getElementById("importLayerInput").click();
         });
@@ -605,12 +597,14 @@
           reader.onload = function(e) {
             try {
               var importedData = JSON.parse(e.target.result);
+              // If the file is in export format, it will have a "pins" property.
               var importedPins = importedData.pins ? importedData.pins : importedData;
               if (Array.isArray(importedPins)) {
                 importedPins.forEach(function(pin) {
                   if (typeof pin.tooltipOpened === "undefined") {
                     pin.tooltipOpened = true;
                   }
+                  // Ensure no duplicates based on id.
                   if (activePinLayer.pins.find(function(item) { return item.id === pin.id; })) {
                     pin.id = "pin_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
                   }
@@ -662,8 +656,7 @@
               B = (num & 0x0000FF) + amt;
           return "#" + (0x1000000 + (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
                    (G < 255 ? (G < 0 ? 0 : G) : 255) * 0x100 +
-                   (B < 255 ? (B < 0 ? 0 : B) : 255))
-                   .toString(16).slice(1);
+                   (B < 255 ? (B < 0 ? 0 : B) : 255)).toString(16).slice(1);
         }
         function darkenColor(hex, percent) {
           return lightenColor(hex, -percent);
@@ -908,7 +901,7 @@
           savePinLayersToDatabase();
         }
 
-        // Edit a pin (open the modal populated with the pin's details).
+        // Edit a pin (populate form and show modal).
         window.editPin = function(pinId) {
           var pin = customPins.find(function(item) { return item.id === pinId; });
           if (pin) {
@@ -933,7 +926,7 @@
 
         var currentEditingPinId = null;
         var currentPinLatLng = null;
-        // Set pin location via right-click on the map.
+        // Set pin location using a right-click on the map.
         map.on("contextmenu", function(e) {
           currentPinLatLng = e.latlng;
           currentEditingPinId = null;
@@ -948,7 +941,7 @@
           var previewWindow = document.getElementById("previewWindow");
           var lighter = lightenColor(selectedColor, 20);
           var darker = darkenColor(selectedColor, 20);
-          var style = "background: " + selectedColor +
+          var style = "background: " + selectedColor + 
                       "; background-image: linear-gradient(135deg, " + lighter + ", " + darker + "); width:100px; height:100px; line-height:100px;";
           if (selectedShape === "circle") {
             style += "border-radius:50%;";
@@ -1041,7 +1034,7 @@
           }
           // If adding a new pin, ensure a location was selected.
           if (!currentEditingPinId && !currentPinLatLng) {
-            alert("No location selected. Please right-click on the map to choose a location for this pin.");
+            alert("No location selected. Please right-click on the map to choose a location.");
             return;
           }
           if (!activePinLayer) {
@@ -1076,7 +1069,7 @@
               icon: iconType,
               tooltipOpened: true
             };
-            // If activePinLayer.pins is undefined, initialize it as an empty array.
+            // Ensure activePinLayer.pins is an array.
             if (!activePinLayer.pins) {
               activePinLayer.pins = [];
             }
@@ -1157,8 +1150,7 @@
           sortedPins.forEach(function(pin) {
             var textDecoration = pin.tooltipOpened ? "none" : "line-through";
             var iconData = parseIconValue(pin.icon);
-            html += "<li style='padding:2px 0; border-bottom:1px solid #ccc; text-decoration:" +
-                    textDecoration + ";'>";
+            html += "<li style='padding:2px 0; border-bottom:1px solid #ccc; text-decoration:" + textDecoration + ";'>";
             html += "<span style='display: inline-block; background:" + iconData.color +
                     "; width:15px; height:15px; margin-right: 5px;";
             if (iconData.shape === "circle") {
