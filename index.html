@@ -228,6 +228,30 @@
     </style>
   </head>
   <body>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyDXfhDG2NhylapRByYpE5leAEuIiyHPdBQ",
+    authDomain: "nts-air.firebaseapp.com",
+    databaseURL: "https://nts-air.firebaseio.com",
+    projectId: "nts-air",
+    storageBucket: "nts-air.firebasestorage.app",
+    messagingSenderId: "690931555767",
+    appId: "1:690931555767:web:506a87b24fad77653f1c32",
+    measurementId: "G-7HNTMVW7Z9"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
     <!-- Left Side Menu to Show Sorted Pins -->
     <div id="pinListMenu"></div>
     <!-- Search Container -->
