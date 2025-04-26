@@ -8,10 +8,14 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <!-- MarkerCluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
+    />
     <style>
       /* Basic Page & Map Styling */
-      html, body {
+      html,
+      body {
         height: 100%;
         margin: 0;
         padding: 0;
@@ -32,7 +36,7 @@
         margin-bottom: 5px;
         padding: 10px;
         border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         color: #fff;
         opacity: 0.9;
         transition: opacity 0.5s ease;
@@ -50,7 +54,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255,255,255,0.95);
+        background: rgba(255, 255, 255, 0.95);
         z-index: 30000;
         display: flex;
         flex-direction: column;
@@ -167,7 +171,7 @@
         padding: 20px;
         border-radius: 12px;
         width: 320px;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
       }
       #pinFormModal label {
         font-weight: bold;
@@ -376,7 +380,7 @@
       };
       firebase.initializeApp(firebaseConfig);
 
-      // Notification function
+      /**************** Notification Function ******************/
       function showNotification(message, type) {
         var container = document.getElementById("notificationContainer");
         var notif = document.createElement("div");
@@ -391,7 +395,7 @@
         }, 3000);
       }
 
-      // Authentication UI Handlers
+      /**************** Authentication UI Handlers ******************/
       const signInForm = document.getElementById("signInForm");
       const signUpForm = document.getElementById("signUpForm");
       const signInContainer = document.getElementById("signInContainer");
@@ -447,7 +451,7 @@
         }
       });
 
-      // Main App Initialization – Mapping & Realtime Database
+      /**************** Main App: Initialization (Mapping & Realtime Database) ******************/
       function initMapAndRealtime() {
         var map = L.map("map", {
           center: [45.541, 10.211],
@@ -457,7 +461,7 @@
           attribution: "Map data © OpenStreetMap contributors"
         });
         baseLayer.addTo(map);
-        // Remove demo marker if not needed.
+        // Optional: Remove demo marker if not needed.
         // var demoMarker = L.marker([45.541, 10.211]).addTo(map).bindPopup("Welcome!").openPopup();
 
         var vehicleLayer = L.markerClusterGroup();
@@ -466,17 +470,17 @@
         customPinLayer.addTo(map);
         L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
 
-        // Define clearCustomPinMarkers function.
+        /***** Define clearCustomPinMarkers Function *****/
         function clearCustomPinMarkers() {
           customPinLayer.clearLayers();
           customPinMarkers = {};
         }
 
-        // Firebase Realtime Database: Pin Layers
-        var pinLayers = [];           // all layers
-        var activePinLayerId = null;  // id of active layer
-        var activePinLayer = null;    // active layer object
-        var customPins = [];          // pins of the active layer
+        /***** Firebase Realtime Database Integration for Pin Layers *****/
+        var pinLayers = [];           // Array for all layers
+        var activePinLayerId = null;
+        var activePinLayer = null;
+        var customPins = [];          // Pins of the active layer
 
         function savePinLayersToDatabase() {
           firebase.database().ref("globalMapPinLayers").set(pinLayers, function(error) {
@@ -505,7 +509,7 @@
             activePinLayer = pinLayers.find(function(layer) {
               return layer.id === activePinLayerId;
             }) || pinLayers[0];
-            // Ensure that pins is always an array.
+            // Ensure activePinLayer.pins is defined.
             customPins = activePinLayer.pins || [];
             clearCustomPinMarkers();
             loadPinsToMap();
@@ -515,7 +519,7 @@
         }
         loadPinLayersFromDatabase();
 
-        // UI for Layer Selection & Management
+        /***** UI for Layer Selection & Management *****/
         function updateLayerSelectMenu() {
           var select = document.getElementById("pinLayerSelect");
           select.innerHTML = "";
@@ -571,7 +575,7 @@
           }
         });
 
-        // Adjusted Export (Sačuvaj) function – export only the pins array wrapped in an object.
+        // Adjusted Export (Sačuvaj) button – export pins wrapped in an object.
         document.getElementById("exportLayerBtn").addEventListener("click", function() {
           var dataStr = JSON.stringify({ pins: activePinLayer.pins }, null, 4);
           var blob = new Blob([dataStr], { type: "application/json" });
@@ -585,7 +589,7 @@
           URL.revokeObjectURL(url);
         });
 
-        // Import (Dodaj) function remains compatible.
+        // Import (Dodaj) function – now checking for active layer and initializing pins if needed.
         document.getElementById("importLayerBtn").addEventListener("click", function() {
           document.getElementById("importLayerInput").click();
         });
@@ -597,14 +601,19 @@
           reader.onload = function(e) {
             try {
               var importedData = JSON.parse(e.target.result);
-              // If the file is in export format, it will have a "pins" property.
               var importedPins = importedData.pins ? importedData.pins : importedData;
+              if (!activePinLayer) {
+                throw new Error("No active layer available.");
+              }
+              // Ensure activePinLayer.pins is defined
+              if (!activePinLayer.pins) {
+                activePinLayer.pins = [];
+              }
               if (Array.isArray(importedPins)) {
                 importedPins.forEach(function(pin) {
                   if (typeof pin.tooltipOpened === "undefined") {
                     pin.tooltipOpened = true;
                   }
-                  // Ensure no duplicates based on id.
                   if (activePinLayer.pins.find(function(item) { return item.id === pin.id; })) {
                     pin.id = "pin_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
                   }
@@ -799,7 +808,10 @@
             }
           });
           function rectsOverlap(rect1, rect2) {
-            return !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom);
+            return !(rect1.right < rect2.left ||
+                     rect1.left > rect2.right ||
+                     rect1.bottom < rect2.top ||
+                     rect1.top > rect2.bottom);
           }
           var collisionResolved = false;
           var maxIterations = 10;
@@ -812,11 +824,20 @@
                 if (rectsOverlap(tooltips[i].rect, tooltips[j].rect)) {
                   var rectA = tooltips[i].rect;
                   var rectB = tooltips[j].rect;
-                  var centerA = { x: rectA.left + rectA.width / 2, y: rectA.top + rectA.height / 2 };
-                  var centerB = { x: rectB.left + rectB.width / 2, y: rectB.top + rectB.height / 2 };
+                  var centerA = {
+                    x: rectA.left + rectA.width / 2,
+                    y: rectA.top + rectA.height / 2
+                  };
+                  var centerB = {
+                    x: rectB.left + rectB.width / 2,
+                    y: rectB.top + rectB.height / 2
+                  };
                   var dx = centerB.x - centerA.x;
                   var dy = centerB.y - centerA.y;
-                  if (dx === 0 && dy === 0) { dx = 5; dy = 5; }
+                  if (dx === 0 && dy === 0) {
+                    dx = 5;
+                    dy = 5;
+                  }
                   var dist = Math.sqrt(dx * dx + dy * dy);
                   var shiftStep = 10;
                   var shiftX = (dx / dist) * shiftStep;
@@ -926,7 +947,7 @@
 
         var currentEditingPinId = null;
         var currentPinLatLng = null;
-        // Set pin location using a right-click on the map.
+        // Set pin location via right-click on the map.
         map.on("contextmenu", function(e) {
           currentPinLatLng = e.latlng;
           currentEditingPinId = null;
@@ -941,7 +962,7 @@
           var previewWindow = document.getElementById("previewWindow");
           var lighter = lightenColor(selectedColor, 20);
           var darker = darkenColor(selectedColor, 20);
-          var style = "background: " + selectedColor + 
+          var style = "background: " + selectedColor +
                       "; background-image: linear-gradient(135deg, " + lighter + ", " + darker + "); width:100px; height:100px; line-height:100px;";
           if (selectedShape === "circle") {
             style += "border-radius:50%;";
@@ -1032,7 +1053,6 @@
             alert("Title is required!");
             return;
           }
-          // If adding a new pin, ensure a location was selected.
           if (!currentEditingPinId && !currentPinLatLng) {
             alert("No location selected. Please right-click on the map to choose a location.");
             return;
@@ -1069,7 +1089,6 @@
               icon: iconType,
               tooltipOpened: true
             };
-            // Ensure activePinLayer.pins is an array.
             if (!activePinLayer.pins) {
               activePinLayer.pins = [];
             }
@@ -1150,15 +1169,16 @@
           sortedPins.forEach(function(pin) {
             var textDecoration = pin.tooltipOpened ? "none" : "line-through";
             var iconData = parseIconValue(pin.icon);
-            html += "<li style='padding:2px 0; border-bottom:1px solid #ccc; text-decoration:" + textDecoration + ";'>";
+            html += "<li style='padding:2px 0; border-bottom:1px solid #ccc; text-decoration:" +
+                    textDecoration + ";'>";
             html += "<span style='display: inline-block; background:" + iconData.color +
                     "; width:15px; height:15px; margin-right: 5px;";
             if (iconData.shape === "circle") {
               html += "border-radius:50%;";
             }
             html += "'></span>";
-            html += "<span>" + (pin.number ? pin.number + " " : "") + pin.title + " - " +
-                    pin.description + "</span>";
+            html += "<span>" + (pin.number ? pin.number + " " : "") + pin.title +
+                    " - " + pin.description + "</span>";
             html += "</li>";
           });
           html += "</ul>";
