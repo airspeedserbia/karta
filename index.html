@@ -326,12 +326,12 @@
         var password = "airspeed1";
         var ntsLog = new NtsLogin();
         ntsLog.login(
-          "http://app.nts-international.net/NTSSecurity/login",
+          "https://app.nts-international.net/NTSSecurity/login",
           ccodeAndApiUsername,
           password,
           function () {
             console.log("Telematics API login successful!");
-            window.api = new NTSApi("http://app.nts-international.net");
+            window.api = new NTSApi("https://app.nts-international.net");
             function updateVehiclesFromTelematics() {
               vehicleLayer.clearLayers();
               console.log("Fetching all vehicles...");
