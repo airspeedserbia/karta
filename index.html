@@ -483,12 +483,6 @@
         customPinLayer.addTo(map);
         L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
 
-        // (Optional) Tele-matics API integration code could go here if needed.
-        // For now, we simply add one demonstration marker:
-        var demoMarker = L.marker([45.541, 10.211]).addTo(map)
-                           .bindPopup("Welcome to the Global Map Project!")
-                           .openPopup();
-
         /***** Firebase Realtime Database Integration for Pin Layers *****/
         var pinLayers = [];           // Array to store layers (from Firebase)
         var activePinLayerId = null;  // ID of active layer
