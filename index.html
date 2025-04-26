@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Global Map Project with Multiple Custom Pin Layers & Rename Option</title>
+    <title>Global Map Project (Email/Password, Firebase Realtime)</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <!-- MarkerCluster CSS -->
@@ -22,12 +22,85 @@
         height: 100vh;
         width: 100%;
       }
-      /* Override Leaflet divIcon defaults to remove white square and border */
-      .leaflet-div-icon {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+      
+      /* Notifications Container (top-right) */
+      #notificationContainer {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 20000;
       }
+      .notification {
+        margin-bottom: 5px;
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        color: #fff;
+        opacity: 0.9;
+        transition: opacity 0.5s ease;
+      }
+      .notification.success {
+        background-color: #4caf50;
+      }
+      .notification.error {
+        background-color: #f44336;
+      }
+      
+      /* Authentication UI Overlay */
+      #auth-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.95);
+        z-index: 30000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #auth-container h2 {
+        margin-bottom: 10px;
+      }
+      #auth-container form {
+        margin-bottom: 10px;
+      }
+      #auth-container input {
+        padding: 8px;
+        margin: 4px 0;
+        width: 250px;
+        box-sizing: border-box;
+      }
+      #auth-container button {
+        padding: 8px 16px;
+        margin-top: 4px;
+        cursor: pointer;
+      }
+      #auth-container p {
+        margin: 5px 0;
+      }
+      #auth-container a {
+        color: blue;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      
+      /* Left Side Menu for Pin List */
+      #pinListMenu {
+        position: absolute;
+        top: 3.5cm;
+        left: 0.5cm;
+        width: 7cm;
+        height: 15cm;
+        background: #fff;
+        border: 1px solid #ccc;
+        overflow-y: auto;
+        z-index: 10000;
+        padding: 5px;
+        font-size: 14px;
+      }
+      
       /* Search Container & Results */
       #searchContainer {
         position: absolute;
@@ -59,6 +132,7 @@
       #searchResults li:hover {
         background: #f0f0f0;
       }
+      
       /* Layer Selection Container (top-center) */
       #layerSelectContainer {
         position: absolute;
@@ -71,7 +145,6 @@
         padding: 5px;
         font-size: 14px;
       }
-      /* Container for layer buttons */
       #layerButtons {
         display: inline-block;
         margin-left: 30px;
@@ -82,23 +155,7 @@
         cursor: pointer;
         margin-right: 5px;
       }
-      /* Left Side Menu for Pin List */
-      #pinListMenu {
-        position: absolute;
-        top: 3.5cm;
-        left: 0.5cm;
-        width: 7cm;
-        height: 15cm;
-        background: #fff;
-        border: 1px solid #ccc;
-        overflow-y: auto;
-        z-index: 10000;
-        padding: 5px;
-        font-size: 14px;
-      }
-      #pinListMenu strong {
-        font-weight: normal;
-      }
+      
       /* Modal for Custom Pin Form */
       #pinFormModal {
         display: none;
@@ -118,7 +175,6 @@
         border-radius: 12px;
         width: 320px;
         box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-        transition: all 0.3s ease-in-out;
       }
       #pinFormModal label {
         font-weight: bold;
@@ -129,6 +185,7 @@
         margin-bottom: 10px;
         box-sizing: border-box;
       }
+      
       /* Icon Custom Options Layout */
       #iconCustomOptions {
         display: flex;
@@ -181,6 +238,7 @@
       .selected {
         border-color: orange !important;
       }
+      
       /* Enhanced Marker styles for map icons */
       .custom-marker {
         font-size: 10px;
@@ -194,6 +252,7 @@
         transform: scale(1.2);
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       }
+      
       /* Tooltip styling */
       .custom-tooltip {
         background: rgba(0,0,0,0.8);
@@ -202,6 +261,7 @@
         border-radius: 3px;
         font-size: 12px;
       }
+      
       /* Context Menu Styling */
       .custom-context-menu {
         text-align: center;
@@ -224,14 +284,43 @@
     </style>
   </head>
   <body>
-    <!-- Left Side Menu to Show Sorted Pins -->
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Authentication UI Overlay -->
+    <div id="auth-container">
+      <!-- Sign In Form -->
+      <div id="signInContainer">
+        <h2>Sign In</h2>
+        <form id="signInForm">
+          <input type="email" id="signInEmail" placeholder="Email" required />
+          <input type="password" id="signInPassword" placeholder="Password" required />
+          <button type="submit">Sign In</button>
+        </form>
+        <p>
+          Don't have an account? <a id="showSignUp" href="#">Sign Up</a>
+        </p>
+      </div>
+      <!-- Sign Up Form -->
+      <div id="signUpContainer" style="display: none;">
+        <h2>Sign Up</h2>
+        <form id="signUpForm">
+          <input type="email" id="signUpEmail" placeholder="Email" required />
+          <input type="password" id="signUpPassword" placeholder="Password" required />
+          <button type="submit">Sign Up</button>
+        </form>
+        <p>
+          Already have an account? <a id="showSignIn" href="#">Sign In</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Main App Content -->
     <div id="pinListMenu"></div>
-    <!-- Search Container -->
     <div id="searchContainer">
       <input type="text" id="searchBar" placeholder="Search location..." />
       <ul id="searchResults"></ul>
     </div>
-    <!-- Layer Selection Container -->
     <div id="layerSelectContainer">
       <select id="pinLayerSelect"></select>
       <div id="layerButtons">
@@ -241,7 +330,6 @@
         <button id="deleteLayerBtn">Obriši</button>
       </div>
     </div>
-    <!-- Map Container -->
     <div id="map"></div>
     <!-- Hidden File Input for Importing Layers -->
     <input type="file" id="importLayerInput" style="display: none;" accept="application/json" />
@@ -255,15 +343,14 @@
         <input type="text" id="pinNumber" placeholder="Oznaka kamiona" />
         <label for="pinDescription">Detalji:</label>
         <textarea id="pinDescription" placeholder="Količina, težina.."></textarea>
-        <label> </label>
         <!-- Icon Custom Options Layout -->
         <div id="iconCustomOptions">
           <div id="shapeSelection">
             <div class="shape-option" data-shape="square">
-              <div style="width:30px;height:30px; border:1px solid gray;"></div>
+              <div style="width:30px; height:30px; border:1px solid gray;"></div>
             </div>
             <div class="shape-option" data-shape="circle">
-              <div style="width:30px;height:30px; border:1px solid gray; border-radius:50%;"></div>
+              <div style="width:30px; height:30px; border:1px solid gray; border-radius:50%;"></div>
             </div>
           </div>
           <div id="colorSelection">
@@ -277,122 +364,177 @@
         <button id="cancelPinBtn">Otkaži</button>
       </div>
     </div>
+
     <!-- Load Third-Party Libraries -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <!-- Telematics API Libraries -->
-    <script src="HTTPS://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
-    <script src="HTTPS://app.nts-international.net/com/nts/js/nts-api.js"></script>
+    <!-- Firebase SDKs (compat libraries for easier migration) -->
+    <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-auth-compat.js"></script>
+
     <script>
-      (function () {
-        // Global variables for tracking current pin placement
-        var currentEditingPinId = null;
-        var currentPinLatLng = null;
-        // Force XHR to send credentials
-        (function (open) {
-          XMLHttpRequest.prototype.open = function (
-            method,
-            url,
-            async,
-            user,
-            password
-          ) {
-            this.withCredentials = true;
-            open.call(this, method, url, async, user, password);
-          };
-        })(XMLHttpRequest.prototype.open);
-  
-        /**************** Global Map & Layer Setup ******************/
+      /**************** Firebase Configuration & Initialization ******************/
+      // IMPORTANT: Replace the placeholders with your actual Firebase project configuration.
+      const firebaseConfig = {
+        apiKey: "AIzaSyDV4B8Ndpl8qQX6Ou9k2ys9Gif8HNb24QE",
+        authDomain: "nts-air.firebaseapp.com",
+        databaseURL: "https://nts-air.firebaseio.com",
+        projectId: "nts-air",
+        storageBucket: "nts-air.appspot.com",
+        messagingSenderId: "690931555767",
+        appId: "1:690931555767:web:506a87b24fad77653f1c32"
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      /**************** Notification Function ******************/
+      function showNotification(message, type) {
+        var container = document.getElementById("notificationContainer");
+        var notif = document.createElement("div");
+        notif.className = "notification " + (type || "success");
+        notif.textContent = message;
+        container.appendChild(notif);
+        setTimeout(function () {
+          notif.style.opacity = 0;
+          setTimeout(function () {
+            container.removeChild(notif);
+          }, 500);
+        }, 3000);
+      }
+
+      /**************** Authentication UI Handlers ******************/
+      const signInForm = document.getElementById("signInForm");
+      const signUpForm = document.getElementById("signUpForm");
+      const signInContainer = document.getElementById("signInContainer");
+      const signUpContainer = document.getElementById("signUpContainer");
+      const showSignUpLink = document.getElementById("showSignUp");
+      const showSignInLink = document.getElementById("showSignIn");
+
+      // Toggle between Sign In and Sign Up
+      showSignUpLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        signUpContainer.style.display = "block";
+        signInContainer.style.display = "none";
+      });
+      showSignInLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        signUpContainer.style.display = "none";
+        signInContainer.style.display = "block";
+      });
+
+      // Sign In handler
+      signInForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = document.getElementById("signInEmail").value;
+        const password = document.getElementById("signInPassword").value;
+        firebase.auth().signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            showNotification("Signed in as " + userCredential.user.email, "success");
+          })
+          .catch((error) => {
+            showNotification("Sign-In Error: " + error.message, "error");
+          });
+      });
+
+      // Sign Up handler
+      signUpForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = document.getElementById("signUpEmail").value;
+        const password = document.getElementById("signUpPassword").value;
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            showNotification("Account created: " + userCredential.user.email, "success");
+          })
+          .catch((error) => {
+            showNotification("Sign-Up Error: " + error.message, "error");
+          });
+      });
+
+      // Monitor Authentication State
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          // User signed in — hide auth UI
+          document.getElementById("auth-container").style.display = "none";
+          console.log("User signed in: ", user.email, user.uid);
+          // Now initialize the main app (mapping, realtime database, etc.)
+          initMapAndRealtime();
+        } else {
+          // No user — show auth UI
+          document.getElementById("auth-container").style.display = "flex";
+          console.log("No user signed in.");
+        }
+      });
+
+      /**************** Main App: Initialization (Mapping & Realtime Database) ******************/
+      function initMapAndRealtime() {
+        /***** Initialize Map *****/
         var map = L.map("map", {
           center: [45.541, 10.211],
           zoom: 7,
         });
-        var baseLayer = L.tileLayer(
-          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          { attribution: "Map data © OpenStreetMap contributors" }
-        );
+        var baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "Map data © OpenStreetMap contributors"
+        });
         baseLayer.addTo(map);
+        // Create two layers: one for vehicle markers and one for custom pins
         var vehicleLayer = L.markerClusterGroup();
         var customPinLayer = L.layerGroup();
         vehicleLayer.addTo(map);
         customPinLayer.addTo(map);
-        var baseLayers = { "Base Map": baseLayer };
-        var overlays = { "Vozila": vehicleLayer, "Utovari": customPinLayer };
-        L.control.layers(baseLayers, overlays).addTo(map);
-  
-        /**************** Telematics API Integration ****************/
-        var ccodeAndApiUsername = "t0190-api.marko";
-        var password = "marko2024";
-        var ntsLog = new NtsLogin();
-        ntsLog.login(
-          "HTTPS://app.nts-international.net/NTSSecurity/login",
-          ccodeAndApiUsername,
-          password,
-          function () {
-            console.log("Telematics API login successful!");
-            window.api = new NTSApi("HTTPS://app.nts-international.net");
-            function updateVehiclesFromTelematics() {
-              vehicleLayer.clearLayers();
-              console.log("Fetching all vehicles...");
-              api.allvehicles(function (vehicles) {
-                console.log("All vehicles response:", vehicles);
-                if (!vehicles || !Array.isArray(vehicles)) {
-                  console.warn("No vehicles returned or response not an array. Check credentials/API permissions.");
-                  return;
-                }
-                vehicles.forEach(function (vehicle) {
-                  console.log("Processing vehicle with id:", vehicle.id);
-                  api.vehiclestate(
-                    vehicle.id,
-                    "UTC",
-                    2,
-                    false,
-                    false,
-                    function (state) {
-                      console.log("Vehicle state for id", vehicle.id, ":", state);
-                      if (state && state.gpsLat && state.gpsLon) {
-                        var marker = L.marker([state.gpsLat, state.gpsLon]).bindPopup(
-                          "Vehicle ID: " + vehicle.id
-                        );
-                        vehicleLayer.addLayer(marker);
-                      } else {
-                        console.warn("No valid GPS data for vehicle id:", vehicle.id);
-                      }
-                    }
-                  );
-                });
-              });
+        L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
+
+        // (Optional) Tele-matics API integration code could go here if needed.
+        // For now, we simply add one demonstration marker:
+        var demoMarker = L.marker([45.541, 10.211]).addTo(map)
+                           .bindPopup("Welcome to the Global Map Project!")
+                           .openPopup();
+
+        /***** Firebase Realtime Database Integration for Pin Layers *****/
+        var pinLayers = [];           // Array to store layers (from Firebase)
+        var activePinLayerId = null;  // ID of active layer
+        var activePinLayer = null;    // Active layer object
+        var customPins = [];          // Shortcut to active pin layer's pins
+
+        // Save pinLayers to Firebase (overwrite = last write wins)
+        function savePinLayersToDatabase() {
+          firebase.database().ref("globalMapPinLayers").set(pinLayers, function(error) {
+            if (error) {
+              showNotification("Error saving data: " + error, "error");
+            } else {
+              showNotification("Changes saved", "success");
             }
-            updateVehiclesFromTelematics();
-            setInterval(updateVehiclesFromTelematics, 60000);
-          }
-        );
-  
-        /**************** Custom Pin Layer Management ****************/
-        var pinLayerStorageKey = "globalMapPinLayers";
-        var pinLayers = [];
-        var activePinLayerId = null;
-        var activePinLayer = null;
-        function savePinLayersToStorage() {
-          localStorage.setItem(pinLayerStorageKey, JSON.stringify(pinLayers));
+          });
         }
-        function loadPinLayersFromStorage() {
-          var data = localStorage.getItem(pinLayerStorageKey);
-          return data ? JSON.parse(data) : [];
+
+        // Listen for changes to pin layers in Firebase
+        function loadPinLayersFromDatabase() {
+          firebase.database().ref("globalMapPinLayers").on("value", function(snapshot) {
+            var data = snapshot.val();
+            if (data) {
+              pinLayers = data;
+            } else {
+              // If no data, initialize with a default layer
+              var defaultLayer = { id: "layer_default", name: ". nedelja", pins: [] };
+              pinLayers = [defaultLayer];
+              activePinLayerId = defaultLayer.id;
+              savePinLayersToDatabase();
+            }
+            if (!activePinLayerId) {
+              activePinLayerId = pinLayers[0].id;
+            }
+            activePinLayer = pinLayers.find(function(layer) {
+              return layer.id === activePinLayerId;
+            }) || pinLayers[0];
+            customPins = activePinLayer.pins;
+            clearCustomPinMarkers();
+            loadPinsToMap();
+            updateLayerSelectMenu();
+            updatePinListMenu();
+          });
         }
-        pinLayers = loadPinLayersFromStorage();
-        if (pinLayers.length === 0) {
-          var defaultLayer = { id: "layer_default", name: ". nedelja", pins: [] };
-          pinLayers.push(defaultLayer);
-          activePinLayerId = defaultLayer.id;
-          savePinLayersToStorage();
-        } else {
-          activePinLayerId = pinLayers[0].id;
-        }
-        activePinLayer = pinLayers.find(function (layer) {
-          return layer.id === activePinLayerId;
-        });
-        var customPins = activePinLayer.pins;
+        loadPinLayersFromDatabase();
+
+        /***** UI for Layer Selection & Management *****/
         function updateLayerSelectMenu() {
           var select = document.getElementById("pinLayerSelect");
           select.innerHTML = "";
@@ -409,180 +551,144 @@
           select.appendChild(optNew);
         }
         updateLayerSelectMenu();
-        document
-          .getElementById("pinLayerSelect")
-          .addEventListener("change", function (e) {
-            if (e.target.value === "create_new") {
-              var layerName = prompt("Enter new layer name:");
-              if (layerName) {
-                var newLayerId = "layer_" + Date.now();
-                var newLayer = { id: newLayerId, name: layerName, pins: [] };
-                pinLayers.push(newLayer);
-                activePinLayerId = newLayerId;
-                activePinLayer = newLayer;
-                savePinLayersToStorage();
-                updateLayerSelectMenu();
-                clearCustomPinMarkers();
-                customPins = activePinLayer.pins;
-                loadPinsToMap();
-              } else {
-                document.getElementById("pinLayerSelect").value = activePinLayerId;
-              }
+
+        document.getElementById("pinLayerSelect").addEventListener("change", function(e) {
+          if (e.target.value === "create_new") {
+            var layerName = prompt("Enter new layer name:");
+            if (layerName) {
+              var newLayerId = "layer_" + Date.now();
+              var newLayer = { id: newLayerId, name: layerName, pins: [] };
+              pinLayers.push(newLayer);
+              activePinLayerId = newLayerId;
+              activePinLayer = newLayer;
+              savePinLayersToDatabase();
+              updateLayerSelectMenu();
+              clearCustomPinMarkers();
+              customPins = activePinLayer.pins;
+              loadPinsToMap();
+              showNotification("New layer created", "success");
             } else {
-              activePinLayerId = e.target.value;
-              activePinLayer = pinLayers.find(function (layer) {
-                return layer.id === activePinLayerId;
-              });
-              clearCustomPinMarkers();
-              customPins = activePinLayer.pins;
-              loadPinsToMap();
+              document.getElementById("pinLayerSelect").value = activePinLayerId;
             }
-          });
-        document
-          .getElementById("renameLayerBtn")
-          .addEventListener("click", function () {
-            var newName = prompt(
-              "Enter new name for the current layer:",
-              activePinLayer.name
-            );
-            if (newName) {
-              activePinLayer.name = newName;
-              savePinLayersToStorage();
-              updateLayerSelectMenu();
-            }
-          });
-        document
-          .getElementById("exportLayerBtn")
-          .addEventListener("click", function () {
-            var dataStr = JSON.stringify(activePinLayer, null, 4);
-            var blob = new Blob([dataStr], { type: "application/json" });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement("a");
-            a.href = url;
-            a.download = activePinLayer.name.replace(/\s+/g, "_") + ".json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-          });
-        document
-          .getElementById("importLayerBtn")
-          .addEventListener("click", function () {
-            document.getElementById("importLayerInput").click();
-          });
-        document
-          .getElementById("importLayerInput")
-          .addEventListener("change", function (e) {
-            var file = e.target.files[0];
-            if (!file) return;
-            var reader = new FileReader();
-            reader.onload = function (e) {
-              try {
-                var importedData = JSON.parse(e.target.result);
-                var importedPins = importedData.pins
-                  ? importedData.pins
-                  : importedData;
-                if (Array.isArray(importedPins)) {
-                  importedPins.forEach(function (pin) {
-                    if (typeof pin.tooltipOpened === "undefined") {
-                      pin.tooltipOpened = true;
-                    }
-                    if (
-                      activePinLayer.pins.find(function (item) {
-                        return item.id === pin.id;
-                      })
-                    ) {
-                      pin.id =
-                        "pin_" +
-                        Date.now() +
-                        "_" +
-                        Math.floor(Math.random() * 1000);
-                    }
-                    activePinLayer.pins.push(pin);
-                  });
-                  savePinLayersToStorage();
-                  clearCustomPinMarkers();
-                  loadPinsToMap();
-                } else {
-                  throw new Error(
-                    "Invalid file format. Expected an object with a 'pins' array."
-                  );
-                }
-              } catch (ex) {
-                alert("Error importing file: " + ex.message);
+          } else {
+            activePinLayerId = e.target.value;
+            activePinLayer = pinLayers.find(function(layer) {
+              return layer.id === activePinLayerId;
+            });
+            clearCustomPinMarkers();
+            customPins = activePinLayer.pins;
+            loadPinsToMap();
+          }
+        });
+
+        document.getElementById("renameLayerBtn").addEventListener("click", function() {
+          var newName = prompt("Enter new name for the current layer:", activePinLayer.name);
+          if (newName) {
+            activePinLayer.name = newName;
+            savePinLayersToDatabase();
+            updateLayerSelectMenu();
+          }
+        });
+
+        document.getElementById("exportLayerBtn").addEventListener("click", function() {
+          var dataStr = JSON.stringify(activePinLayer, null, 4);
+          var blob = new Blob([dataStr], { type: "application/json" });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = activePinLayer.name.replace(/\s+/g, "_") + ".json";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+
+        document.getElementById("importLayerBtn").addEventListener("click", function() {
+          document.getElementById("importLayerInput").click();
+        });
+
+        document.getElementById("importLayerInput").addEventListener("change", function(e) {
+          var file = e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              var importedData = JSON.parse(e.target.result);
+              var importedPins = importedData.pins ? importedData.pins : importedData;
+              if (Array.isArray(importedPins)) {
+                importedPins.forEach(function(pin) {
+                  if (typeof pin.tooltipOpened === "undefined") {
+                    pin.tooltipOpened = true;
+                  }
+                  if (activePinLayer.pins.find(function(item) { return item.id === pin.id; })) {
+                    pin.id = "pin_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                  }
+                  activePinLayer.pins.push(pin);
+                });
+                savePinLayersToDatabase();
+                clearCustomPinMarkers();
+                loadPinsToMap();
+                showNotification("Pins imported successfully", "success");
+              } else {
+                throw new Error("Invalid file format. Expected an object with a 'pins' array.");
               }
-            };
-            reader.readAsText(file);
-            e.target.value = "";
-          });
-        document
-          .getElementById("deleteLayerBtn")
-          .addEventListener("click", function () {
-            if (confirm("Jesi li siguran?")) {
-              if (pinLayers.length === 1) {
-                alert("Cannot delete the only layer.");
-                return;
-              }
-              pinLayers = pinLayers.filter(function (layer) {
-                return layer.id !== activePinLayerId;
-              });
-              activePinLayer = pinLayers[0];
-              activePinLayerId = activePinLayer.id;
-              customPins = activePinLayer.pins;
-              savePinLayersToStorage();
-              updateLayerSelectMenu();
-              clearCustomPinMarkers();
-              loadPinsToMap();
+            } catch (ex) {
+              alert("Error importing file: " + ex.message);
             }
-          });
-        function clearCustomPinMarkers() {
-          customPinLayer.clearLayers();
-          customPinMarkers = {};
-        }
+          };
+          reader.readAsText(file);
+          e.target.value = "";
+        });
+
+        document.getElementById("deleteLayerBtn").addEventListener("click", function() {
+          if (confirm("Jesi li siguran?")) {
+            if (pinLayers.length === 1) {
+              alert("Cannot delete the only layer.");
+              return;
+            }
+            pinLayers = pinLayers.filter(function(layer) {
+              return layer.id !== activePinLayerId;
+            });
+            activePinLayer = pinLayers[0];
+            activePinLayerId = activePinLayer.id;
+            customPins = activePinLayer.pins;
+            savePinLayersToDatabase();
+            updateLayerSelectMenu();
+            clearCustomPinMarkers();
+            loadPinsToMap();
+            showNotification("Layer deleted", "success");
+          }
+        });
+
+        /***** Custom Pin Functionality *****/
         var customPinMarkers = {};
-  
-        /**************** Helper Functions for Enhancing Pins ****************/
+
         function lightenColor(hex, percent) {
           var num = parseInt(hex.replace("#", ""), 16),
               amt = Math.round(2.55 * percent),
               R = (num >> 16) + amt,
               G = (num >> 8 & 0x00FF) + amt,
               B = (num & 0x0000FF) + amt;
-          return "#" + (
-            0x1000000 +
-            (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
-            (G < 255 ? (G < 0 ? 0 : G) : 255) * 0x100 +
-            (B < 255 ? (B < 0 ? 0 : B) : 255)
-          ).toString(16).slice(1);
+          return "#" + (0x1000000 + (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
+                   (G < 255 ? (G < 0 ? 0 : G) : 255) * 0x100 +
+                   (B < 255 ? (B < 0 ? 0 : B) : 255))
+                   .toString(16).slice(1);
         }
         function darkenColor(hex, percent) {
           return lightenColor(hex, -percent);
-        }
-  
-        /**************** Custom Pin Functionality ****************/
-        function addCustomPin(pinObj) {
-          activePinLayer.pins.push(pinObj);
-          savePinLayersToStorage();
-        }
-        function removeCustomPin(pinId) {
-          activePinLayer.pins = activePinLayer.pins.filter(function (pin) {
-            return pin.id !== pinId;
-          });
-          customPins = activePinLayer.pins;
-          savePinLayersToStorage();
         }
         function parseIconValue(value) {
           var parts = value.split("-");
           return { color: parts[0], shape: parts[1] };
         }
-        // Function to compute marker size based on the current zoom.
+        // Compute marker size based on current map zoom.
         function getMarkerSize() {
           var baseSize = 20;
           var zoomDiff = map.getZoom() - 13;
           var factor = 1.0366;
           return baseSize * Math.pow(factor, zoomDiff);
         }
-        // Create a marker icon using the current dynamic size and enhanced styling.
+        // Create a custom marker icon (with gradient, shape, and optional number)
         function createMarkerIcon(iconData, pinNumber) {
           var size = getMarkerSize();
           var lighter = lightenColor(iconData.color, 20);
@@ -594,64 +700,53 @@
             "height:" + size + "px; " +
             "line-height:" + size + "px; " +
             "text-align: center;";
-          if (iconData.shape === "circle") {
+          if(iconData.shape === "circle") {
             inlineStyle += "border-radius:" + (size / 2) + "px;";
           }
-          var htmlContent =
-            '<div class="custom-marker" style="' +
-            inlineStyle +
-            '">' +
-            (pinNumber || "") +
-            "</div>";
+          var htmlContent = '<div class="custom-marker" style="' + inlineStyle + '">' +
+                            (pinNumber || "") + "</div>";
           return L.divIcon({
             html: htmlContent,
             iconSize: [size, size],
-            iconAnchor: [size / 2, size],
+            iconAnchor: [size / 2, size]
           });
         }
-        // Modified createPinMarker which also stores pin data on the marker.
+        // Create and add a custom pin marker to the map
         function createPinMarker(pin) {
           var iconData = parseIconValue(pin.icon);
           if (iconData.shape === "triangle") {
-            iconData.shape = "circle";
+            iconData.shape = "circle"; // normalize triangle to circle if needed
           }
           var divIcon = createMarkerIcon(iconData, pin.number);
           var marker = L.marker([pin.lat, pin.lng], {
             icon: divIcon,
-            draggable: true,
+            draggable: true
           });
           marker.pinData = pin;
-          marker.on("dragend", function (e) {
+          marker.on("dragend", function(e) {
             var newLatLng = e.target.getLatLng();
-            var foundPin = customPins.find(function (item) {
-              return item.id === pin.id;
-            });
-            if (foundPin) {
+            var foundPin = customPins.find(function(item) { return item.id === pin.id; });
+            if(foundPin) {
               foundPin.lat = newLatLng.lat;
               foundPin.lng = newLatLng.lng;
-              savePinLayersToStorage();
+              savePinLayersToDatabase();
               updateTooltipPositions();
             }
           });
-          marker.on("click", function () {
+          marker.on("click", function() {
             togglePinTooltip(pin.id);
           });
-          marker.on("contextmenu", function (e) {
+          marker.on("contextmenu", function(e) {
             e.originalEvent.preventDefault();
             showContextMenu(pin.id, e.latlng);
           });
-          if (pin.tooltipOpened) {
-            var infoHtml =
-              '<div style="text-align:left;"><strong>' +
-              pin.title +
-              '</strong><br/>' +
-              pin.description +
-              "</div>";
+          if(pin.tooltipOpened) {
+            var infoHtml = '<div style="text-align:left;"><strong>' + pin.title + '</strong><br/>' + pin.description + "</div>";
             marker.bindTooltip(infoHtml, {
               permanent: true,
               direction: "right",
               offset: L.point(3, 5),
-              className: "custom-tooltip",
+              className: "custom-tooltip"
             });
             marker.infoVisible = true;
             marker.originalTooltipContent = infoHtml;
@@ -662,41 +757,44 @@
           customPinLayer.addLayer(marker);
           updateTooltipPositions();
         }
-        // Update all markers on zoom changes.
+        // Update marker icons when zoom levels change
         function updateAllMarkerIcons() {
-          for (var key in customPinMarkers) {
+          for(var key in customPinMarkers) {
             var marker = customPinMarkers[key];
             var pin = marker.pinData;
             var iconData = parseIconValue(pin.icon);
-            if (iconData.shape === "triangle") {
+            if(iconData.shape === "triangle") {
               iconData.shape = "circle";
             }
             var newIcon = createMarkerIcon(iconData, pin.number);
             marker.setIcon(newIcon);
           }
         }
+        // Load all pins for the active layer onto the map
         function loadPinsToMap() {
-          customPins.forEach(function (pin) {
+          customPins.forEach(function(pin) {
             createPinMarker(pin);
           });
           updatePinListMenu();
         }
         loadPinsToMap();
-        map.on("zoomend moveend", function () {
+
+        map.on("zoomend moveend", function() {
           updateAllMarkerIcons();
           updateTooltipPositions();
         });
-        // New Tooltip Repositioning Function based on text tab overlapping detection.
+
+        // Update tooltip positions to avoid overlap
         function updateTooltipPositions() {
           var visibleMarkers = [];
-          for (var key in customPinMarkers) {
+          for(var key in customPinMarkers) {
             var marker = customPinMarkers[key];
-            if (marker.infoVisible && marker.getTooltip()) {
+            if(marker.infoVisible && marker.getTooltip()){
               visibleMarkers.push(marker);
             }
           }
           var tooltips = [];
-          visibleMarkers.forEach(function (marker) {
+          visibleMarkers.forEach(function(marker) {
             var defaultOffset = L.point(13, -7);
             var content = marker.getTooltip().getContent();
             marker.unbindTooltip();
@@ -708,7 +806,7 @@
             });
             marker.openTooltip();
             var tooltipElement = marker.getTooltip().getElement();
-            if (tooltipElement) {
+            if(tooltipElement){
               tooltips.push({
                 marker: marker,
                 offset: defaultOffset,
@@ -717,53 +815,39 @@
             }
           });
           function rectsOverlap(rect1, rect2) {
-            return !(
-              rect1.right < rect2.left ||
-              rect1.left > rect2.right ||
-              rect1.bottom < rect2.top ||
-              rect1.top > rect2.bottom
-            );
+            return !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom);
           }
           var collisionResolved = false;
           var maxIterations = 10;
           var iteration = 0;
-          while (!collisionResolved && iteration < maxIterations) {
+          while(!collisionResolved && iteration < maxIterations) {
             collisionResolved = true;
             iteration++;
-            for (var i = 0; i < tooltips.length; i++) {
-              for (var j = i + 1; j < tooltips.length; j++) {
-                if (rectsOverlap(tooltips[i].rect, tooltips[j].rect)) {
+            for(var i = 0; i < tooltips.length; i++){
+              for(var j = i+1; j < tooltips.length; j++){
+                if(rectsOverlap(tooltips[i].rect, tooltips[j].rect)){
                   var rectA = tooltips[i].rect;
                   var rectB = tooltips[j].rect;
-                  var centerA = {
-                    x: rectA.left + rectA.width / 2,
-                    y: rectA.top + rectA.height / 2,
-                  };
-                  var centerB = {
-                    x: rectB.left + rectB.width / 2,
-                    y: rectB.top + rectB.height / 2,
-                  };
+                  var centerA = { x: rectA.left + rectA.width/2, y: rectA.top + rectA.height/2 };
+                  var centerB = { x: rectB.left + rectB.width/2, y: rectB.top + rectB.height/2 };
                   var dx = centerB.x - centerA.x;
                   var dy = centerB.y - centerA.y;
-                  if (dx === 0 && dy === 0) {
+                  if(dx === 0 && dy === 0){
                     dx = 5;
                     dy = 5;
                   }
-                  var dist = Math.sqrt(dx * dx + dy * dy);
+                  var dist = Math.sqrt(dx*dx + dy*dy);
                   var shiftStep = 10;
-                  var shiftX = (dx / dist) * shiftStep;
-                  var shiftY = (dy / dist) * shiftStep;
-                  tooltips[j].offset = L.point(
-                    tooltips[j].offset.x + shiftX,
-                    tooltips[j].offset.y + shiftY
-                  );
+                  var shiftX = (dx/dist) * shiftStep;
+                  var shiftY = (dy/dist) * shiftStep;
+                  tooltips[j].offset = L.point(tooltips[j].offset.x + shiftX, tooltips[j].offset.y + shiftY);
                   var content = tooltips[j].marker.getTooltip().getContent();
                   tooltips[j].marker.unbindTooltip();
                   tooltips[j].marker.bindTooltip(content, {
                     permanent: true,
                     direction: "right",
                     offset: tooltips[j].offset,
-                    className: "custom-tooltip",
+                    className: "custom-tooltip"
                   });
                   tooltips[j].marker.openTooltip();
                   var newRect = tooltips[j].marker.getTooltip().getElement().getBoundingClientRect();
@@ -774,84 +858,76 @@
             }
           }
         }
+        // Toggle tooltip visibility on marker click
         function togglePinTooltip(pinId) {
           var marker = customPinMarkers[pinId];
-          if (!marker) return;
-          var pin = customPins.find(function (p) {
-            return p.id === pinId;
-          });
-          if (!pin) return;
-          if (marker.infoVisible) {
+          if(!marker) return;
+          var pin = customPins.find(function(p){ return p.id === pinId; });
+          if(!pin) return;
+          if(marker.infoVisible) {
             marker.unbindTooltip();
             marker.infoVisible = false;
             pin.tooltipOpened = false;
-            savePinLayersToStorage();
+            savePinLayersToDatabase();
           } else {
-            var infoHtml =
-              '<div style="text-align:left;"><strong>' +
-              pin.title +
-              '</strong><br/>' +
-              pin.description +
-              "</div>";
+            var infoHtml = '<div style="text-align:left;"><strong>' + pin.title + '</strong><br/>' + pin.description + "</div>";
             marker.bindTooltip(infoHtml, {
               permanent: true,
               direction: "right",
-              offset: L.point(3, 5),
-              className: "custom-tooltip",
+              offset: L.point(3,5),
+              className: "custom-tooltip"
             });
             marker.infoVisible = true;
             pin.tooltipOpened = true;
             marker.originalTooltipContent = infoHtml;
-            savePinLayersToStorage();
+            savePinLayersToDatabase();
           }
           updateTooltipPositions();
           updatePinListMenu();
         }
+        // Display a context menu for editing or deleting a pin
         function showContextMenu(pinId, latlng) {
-          var popup = L.popup({ offset: L.point(0, -30) })
-            .setLatLng(latlng)
-            .setContent(
-              '<div class="custom-context-menu">' +
-                '<a href="#" onclick="editPin(\'' +
-                pinId +
-                '\'); return false;">Izmeni</a>' +
-                '<a href="#" onclick="deletePin(\'' +
-                pinId +
-                '\'); return false;">Obriši</a>' +
-              "</div>"
-            );
+          var popup = L.popup({ offset: L.point(0,-30) })
+                      .setLatLng(latlng)
+                      .setContent('<div class="custom-context-menu">' +
+                                  '<a href="#" onclick="editPin(\''+pinId+'\'); return false;">Izmeni</a>' +
+                                  '<a href="#" onclick="deletePin(\''+pinId+'\'); return false;">Obriši</a>' +
+                                  "</div>");
           popup.openOn(map);
         }
-        window.deletePin = function (pinId) {
-          if (customPinMarkers[pinId]) {
+        // Delete a pin
+        window.deletePin = function(pinId) {
+          if(customPinMarkers[pinId]) {
             customPinLayer.removeLayer(customPinMarkers[pinId]);
             delete customPinMarkers[pinId];
           }
           removeCustomPin(pinId);
-          console.log("Deleted pin with id:", pinId);
           map.closePopup();
           updateTooltipPositions();
           updatePinListMenu();
         };
-        window.editPin = function (pinId) {
-          var pin = customPins.find(function (item) {
-            return item.id === pinId;
+        function removeCustomPin(pinId) {
+          activePinLayer.pins = activePinLayer.pins.filter(function(pin) {
+            return pin.id !== pinId;
           });
-          if (pin) {
+          customPins = activePinLayer.pins;
+          savePinLayersToDatabase();
+        }
+        // Edit a pin by loading its details in the modal
+        window.editPin = function(pinId) {
+          var pin = customPins.find(function(item){ return item.id === pinId; });
+          if(pin) {
             currentEditingPinId = pinId;
             document.getElementById("modalHeader").textContent = "Edit Custom Pin";
             document.getElementById("pinTitle").value = pin.title;
             document.getElementById("pinNumber").value = pin.number;
             document.getElementById("pinDescription").value = pin.description;
-            // Split the stored icon value to get the color and shape.
             var parts = pin.icon.split("-");
-            // Update the selected icon choices.
             updateSelectedIconChoices(parts[1], parts[0]);
-            // Additionally, load the color palette so you can change the pin's appearance.
             var tableHTML = generateColorTable();
             document.getElementById("colorSelection").innerHTML = tableHTML;
-            document.querySelectorAll("#colorSelection .color-option").forEach(function (el) {
-              el.addEventListener("click", function () {
+            document.querySelectorAll("#colorSelection .color-option").forEach(function(el) {
+              el.addEventListener("click", function() {
                 var c = this.getAttribute("data-color");
                 updateSelectedIconChoices(selectedShape, c);
               });
@@ -859,39 +935,40 @@
             document.getElementById("pinFormModal").style.display = "flex";
           }
         };
-        map.on("contextmenu", function (e) {
+
+        var currentEditingPinId = null;
+        var currentPinLatLng = null;
+        // Open pin form on map right-click
+        map.on("contextmenu", function(e) {
           currentPinLatLng = e.latlng;
           currentEditingPinId = null;
-          document.getElementById("modalHeader").textContent = "";
+          document.getElementById("modalHeader").textContent = "Add Custom Pin";
           showPinForm();
         });
-        /* --- Icon Selection Variables and Functions --- */
+
+        /***** Icon Selection Functions *****/
         var selectedShape = "circle";
         var selectedColor = "blue";
         function updatePreview() {
           var previewWindow = document.getElementById("previewWindow");
           var lighter = lightenColor(selectedColor, 20);
           var darker = darkenColor(selectedColor, 20);
-          var style =
-            "background: " + selectedColor + "; " +
-            "background-image: linear-gradient(135deg, " + lighter + ", " + darker + "); " +
-            "width:100px; height:100px; line-height:100px;";
-          if (selectedShape === "circle") {
+          var style = "background: " + selectedColor + "; background-image: linear-gradient(135deg, " + lighter + ", " + darker + "); width:100px; height:100px; line-height:100px;";
+          if(selectedShape === "circle"){
             style += "border-radius:50%;";
           }
-          previewWindow.innerHTML =
-            '<div class="custom-marker" style="' + style + '"></div>';
+          previewWindow.innerHTML = '<div class="custom-marker" style="' + style + '"></div>';
         }
         function updateSelectedIconChoices(shape, color) {
-          document.querySelectorAll("#shapeSelection .shape-option").forEach(function (el) {
+          document.querySelectorAll("#shapeSelection .shape-option").forEach(function(el) {
             el.classList.remove("selected");
-            if (el.getAttribute("data-shape") === shape) {
+            if(el.getAttribute("data-shape")=== shape){
               el.classList.add("selected");
             }
           });
-          document.querySelectorAll("#colorSelection .color-option").forEach(function (el) {
+          document.querySelectorAll("#colorSelection .color-option").forEach(function(el) {
             el.classList.remove("selected");
-            if (el.getAttribute("data-color") === color) {
+            if(el.getAttribute("data-color")=== color){
               el.classList.add("selected");
             }
           });
@@ -899,8 +976,8 @@
           selectedColor = color;
           updatePreview();
         }
-        document.querySelectorAll("#shapeSelection .shape-option").forEach(function (el) {
-          el.addEventListener("click", function () {
+        document.querySelectorAll("#shapeSelection .shape-option").forEach(function(el) {
+          el.addEventListener("click", function() {
             var shape = this.getAttribute("data-shape");
             updateSelectedIconChoices(shape, selectedColor);
           });
@@ -911,58 +988,28 @@
           var c = (1 - Math.abs(2 * l - 1)) * s;
           var x = c * (1 - Math.abs((h / 60) % 2 - 1));
           var m = l - c / 2;
-          var r = 0,
-            g = 0,
-            b = 0;
-          if (0 <= h && h < 60) {
-            r = c;
-            g = x;
-            b = 0;
-          } else if (60 <= h && h < 120) {
-            r = x;
-            g = c;
-            b = 0;
-          } else if (120 <= h && h < 180) {
-            r = 0;
-            g = c;
-            b = x;
-          } else if (180 <= h && h < 240) {
-            r = 0;
-            g = x;
-            b = c;
-          } else if (240 <= h && h < 300) {
-            r = x;
-            g = 0;
-            b = c;
-          } else if (300 <= h && h < 360) {
-            r = c;
-            g = 0;
-            b = x;
-          }
+          var r = 0, g = 0, b = 0;
+          if(0<=h && h<60) { r = c; g = x; b = 0; }
+          else if(60<=h && h<120) { r = x; g = c; b = 0; }
+          else if(120<=h && h<180) { r = 0; g = c; b = x; }
+          else if(180<=h && h<240) { r = 0; g = x; b = c; }
+          else if(240<=h && h<300) { r = x; g = 0; b = c; }
+          else if(300<=h && h<360) { r = c; g = 0; b = x; }
           r = Math.round((r + m) * 255);
           g = Math.round((g + m) * 255);
           b = Math.round((b + m) * 255);
-          return (
-            "#" +
-            ((1 << 24) + (r << 16) + (g << 8) + b)
-              .toString(16)
-              .slice(1)
-          );
+          return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
         }
         function generateColorTable() {
           var totalCells = 5 * 9;
           var html = "<table>";
-          for (var i = 0; i < 5; i++) {
+          for(var i = 0; i < 5; i++){
             html += "<tr>";
-            for (var j = 0; j < 9; j++) {
+            for(var j = 0; j < 9; j++){
               var index = i * 9 + j;
               var hue = (index * 360) / totalCells;
               var color = hslToHex(hue, 100, 50);
-              html += "<td><div class='color-option' data-color='" +
-                color +
-                "' style='width:15px; height:15px; background:" +
-                color +
-                "; border:1px solid #ccc;'></div></td>";
+              html += "<td><div class='color-option' data-color='" + color + "' style='width:15px; height:15px; background:" + color + "; border:1px solid #ccc;'></div></td>";
             }
             html += "</tr>";
           }
@@ -977,8 +1024,8 @@
           updateSelectedIconChoices("circle", "blue");
           var tableHTML = generateColorTable();
           document.getElementById("colorSelection").innerHTML = tableHTML;
-          document.querySelectorAll("#colorSelection .color-option").forEach(function (el) {
-            el.addEventListener("click", function () {
+          document.querySelectorAll("#colorSelection .color-option").forEach(function(el) {
+            el.addEventListener("click", function() {
               var c = this.getAttribute("data-color");
               updateSelectedIconChoices(selectedShape, c);
             });
@@ -987,26 +1034,25 @@
         function hidePinForm() {
           document.getElementById("pinFormModal").style.display = "none";
         }
-        document.getElementById("savePinBtn").addEventListener("click", function () {
+        // Handle save and cancel actions for the pin form
+        document.getElementById("savePinBtn").addEventListener("click", function() {
           var title = document.getElementById("pinTitle").value.trim();
           var number = document.getElementById("pinNumber").value.trim();
           var description = document.getElementById("pinDescription").value.trim();
-          if (!title) {
+          if(!title){
             alert("Title is required!");
             return;
           }
           var iconType = selectedColor + "-" + selectedShape;
-          if (currentEditingPinId) {
-            var pin = customPins.find(function (item) {
-              return item.id === currentEditingPinId;
-            });
-            if (pin) {
+          if(currentEditingPinId) {
+            var pin = customPins.find(function(item){ return item.id === currentEditingPinId; });
+            if(pin){
               pin.title = title;
               pin.number = number;
               pin.description = description;
               pin.icon = iconType;
-              savePinLayersToStorage();
-              if (customPinMarkers[currentEditingPinId]) {
+              savePinLayersToDatabase();
+              if(customPinMarkers[currentEditingPinId]){
                 customPinLayer.removeLayer(customPinMarkers[currentEditingPinId]);
                 delete customPinMarkers[currentEditingPinId];
               }
@@ -1023,38 +1069,37 @@
               number: number,
               description: description,
               icon: iconType,
-              tooltipOpened: true,
+              tooltipOpened: true
             };
-            addCustomPin(pinObj);
+            activePinLayer.pins.push(pinObj);
+            savePinLayersToDatabase();
             createPinMarker(pinObj);
           }
           hidePinForm();
           updatePinListMenu();
         });
-        document.getElementById("cancelPinBtn").addEventListener("click", function () {
+        document.getElementById("cancelPinBtn").addEventListener("click", function() {
           hidePinForm();
         });
-  
-        /**************** Dynamic Search Bar Functionality ****************/
+
+        /***** Dynamic Search Bar Functionality *****/
         var searchBar = document.getElementById("searchBar");
         var searchResults = document.getElementById("searchResults");
-        searchBar.addEventListener("keyup", function (e) {
+        searchBar.addEventListener("keyup", function(e) {
           var query = searchBar.value.trim();
-          if (query.length < 3) {
+          if(query.length < 3){
             searchResults.style.display = "none";
             return;
           }
           fetch("https://nominatim.openstreetmap.org/search?format=json&limit=5&q=" + encodeURIComponent(query))
-            .then(function (response) {
-              return response.json();
-            })
-            .then(function (data) {
+            .then(function(response){ return response.json(); })
+            .then(function(data) {
               searchResults.innerHTML = "";
-              if (data.length > 0) {
-                data.forEach(function (result) {
+              if(data.length > 0){
+                data.forEach(function(result){
                   var li = document.createElement("li");
                   li.textContent = result.display_name;
-                  li.addEventListener("click", function () {
+                  li.addEventListener("click", function(){
                     var lat = parseFloat(result.lat);
                     var lon = parseFloat(result.lon);
                     map.setView([lat, lon], 13);
@@ -1067,66 +1112,56 @@
                 searchResults.style.display = "none";
               }
             })
-            .catch(function (error) {
+            .catch(function(error){
               console.error(error);
               searchResults.style.display = "none";
             });
         });
-        searchBar.addEventListener("keydown", function (e) {
-          if (e.key === "Enter") {
+        searchBar.addEventListener("keydown", function(e) {
+          if(e.key === "Enter"){
             e.preventDefault();
-            if (searchResults.firstChild) {
+            if(searchResults.firstChild){
               searchResults.firstChild.click();
             }
           }
         });
-        map.on("zoomend moveend", function () {
-          updateAllMarkerIcons();
-          updateTooltipPositions();
-        });
+
+        /***** Update Pin List Menu *****/
         function updatePinListMenu() {
           var menu = document.getElementById("pinListMenu");
-          var sortedPins = customPins.slice().sort(function (a, b) {
+          var sortedPins = customPins.slice().sort(function(a, b) {
             var aNum = parseFloat(a.number),
-              bNum = parseFloat(b.number);
-            if (!isNaN(aNum) && !isNaN(bNum)) {
-              if (aNum !== bNum) return aNum - bNum;
+                bNum = parseFloat(b.number);
+            if(!isNaN(aNum) && !isNaN(bNum)) {
+              if(aNum !== bNum) return aNum - bNum;
             } else {
-              if (a.number < b.number) return -1;
-              if (a.number > b.number) return 1;
+              if(a.number < b.number) return -1;
+              if(a.number > b.number) return 1;
             }
-            if (a.title < b.title) return -1;
-            if (a.title > b.title) return 1;
-            if (a.description < b.description) return -1;
-            if (a.description > b.description) return 1;
+            if(a.title < b.title) return -1;
+            if(a.title > b.title) return 1;
+            if(a.description < b.description) return -1;
+            if(a.description > b.description) return 1;
             return 0;
           });
           var html = "<ul style='list-style:none; padding:0; margin:0;'>";
-          sortedPins.forEach(function (pin) {
+          sortedPins.forEach(function(pin) {
             var textDecoration = pin.tooltipOpened ? "none" : "line-through";
             var iconData = parseIconValue(pin.icon);
-            html += "<li style='padding:2px 0; border-bottom:1px solid #ccc; text-decoration:" +
-              textDecoration +
-              ";'>";
-            html += "<span style='display: inline-block; background:" +
-              iconData.color +
-              "; width: 15px; height: 15px; margin-right: 5px;";
-            if (iconData.shape === "circle") {
+            html += "<li style='padding:2px 0; border-bottom:1px solid #ccc; text-decoration:" + textDecoration + ";'>";
+            html += "<span style='display: inline-block; background:" + iconData.color + "; width:15px; height:15px; margin-right: 5px;";
+            if(iconData.shape === "circle"){
               html += "border-radius:50%;";
             }
             html += "'></span>";
-            html += "<span>" +
-              (pin.number ? pin.number + " " : "") +
-              pin.title +
-              " - " +
-              pin.description +
-              "</span>";
+            html += "<span>" + (pin.number ? pin.number + " " : "") + pin.title + " - " + pin.description + "</span>";
             html += "</li>";
           });
           html += "</ul>";
           menu.innerHTML = html;
         }
-      })();
+      } // End initMapAndRealtime
+
     </script>
   </body>
 </html>
