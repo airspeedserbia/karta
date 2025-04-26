@@ -59,8 +59,8 @@ const firebaseConfig = {
   databaseURL: "https://nts-air-default-rtdb.firebaseio.com",
   projectId: "nts-air",
   storageBucket: "nts-air.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  messagingSenderId: "690931555767",
+  appId: "1:690931555767:web:506a87b24fad77653f1c32"
 };
 
 // Initialize Firebase
