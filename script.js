@@ -52,19 +52,3 @@ map.on('click', (e) => {
       .addTo(customPinLayer);
   }
 });
-// Your Firebase configuration (replace with your actual config)
-const firebaseConfig = {
-  apiKey: "AIzaSyDV4B8Ndpl8qQX6Ou9k2ys9Gif8HNb24QE",
-  authDomain: "nts-air.firebaseapp.com",
-  databaseURL: "https://nts-air-default-rtdb.firebaseio.com",
-  projectId: "nts-air",
-  storageBucket: "nts-air.appspot.com",
-  messagingSenderId: "690931555767",
-  appId: "1:690931555767:web:506a87b24fad77653f1c32"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Access the Realtime Database
-const db = firebase.database();
