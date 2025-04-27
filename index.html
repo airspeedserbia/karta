@@ -285,8 +285,8 @@
   </style>
 
   <!-- Telematics API Libraries -->
-  <script src="http://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
-  <script src="http://app.nts-international.net/com/nts/js/nts-api.js"></script>
+  <script src="https://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
+  <script src="https://app.nts-international.net/com/nts/js/nts-api.js"></script>
   
   <!-- Leaflet & MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -452,9 +452,9 @@
       var ccodeAndApiUsername = "t0190-api.marko";
       var password = "marko2024";
       var ntsLog = new NtsLogin();
-      ntsLog.login("http://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function () {
+      ntsLog.login("https://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function () {
         console.log("Telematics API login successful!");
-        window.api = new NTSApi("http://app.nts-international.net");
+        window.api = new NTSApi("https://app.nts-international.net");
         function updateVehiclesFromTelematics() {
           vehicleLayer.clearLayers();
           console.log("Fetching all vehicles...");
