@@ -9,7 +9,6 @@
   <!-- MarkerCluster CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-
   <style>
     /* Basic Page & Map Styling */
     html, body {
@@ -98,6 +97,16 @@
       z-index: 10000;
       padding: 5px;
       font-size: 14px;
+    }
+    /* New Button: Positioned 3px below the pin list */
+    #toggleAllUtovare {
+      position: absolute;
+      left: 0.5cm;
+      top: calc(3.5cm + 15cm + 13px);
+      z-index: 10001;
+      padding: 5px 10px;
+      font-size: 14px;
+      cursor: pointer;
     }
     /* Search Container & Results */
     #searchContainer {
@@ -316,6 +325,8 @@
 
   <!-- Main App Content -->
   <div id="pinListMenu"></div>
+  <!-- New Button: Positioned 3px below the pin list -->
+  <button id="toggleAllUtovare">Otvori sve utovare</button>
   <div id="searchContainer">
     <input type="text" id="searchBar" placeholder="Search location..." />
     <ul id="searchResults"></ul>
@@ -438,8 +449,8 @@
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
 
       /**************** NTS Telematics API Integration ****************/
-      var ccodeAndApiUsername = "t0190-timocom";
-      var password = "123";
+      var ccodeAndApiUsername = "t0190-api.marko";
+      var password = "marko2024";
       var ntsLog = new NtsLogin();
       ntsLog.login("http://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function () {
         console.log("Telematics API login successful!");
@@ -1134,6 +1145,34 @@
         html += "</ul>";
         menu.innerHTML = html;
       }
+
+      document.getElementById("toggleAllUtovare").addEventListener("click", function() {
+  var bounds = map.getBounds();
+  // Loop through all custom pin markers and force open the tooltip if the marker is within the map bounds.
+  for (var key in customPinMarkers) {
+    var marker = customPinMarkers[key];
+    if (bounds.contains(marker.getLatLng()) && !marker.infoVisible) {
+      var pin = marker.pinData;
+      var infoHtml = '<div style="text-align:left;"><strong>' + pin.title +
+                     '</strong><br/>' + pin.description + "</div>";
+      marker.bindTooltip(infoHtml, {
+        permanent: true,
+        direction: "right",
+        offset: L.point(3, 5),
+        className: "custom-tooltip"
+      });
+      // Mark the tooltip as open on marker and update underlying data.
+      marker.infoVisible = true;
+      pin.tooltipOpened = true;
+      marker.originalTooltipContent = infoHtml;
+      // Optionally, save changes to the database.
+      savePinLayersToDatabase();
+    }
+  }
+  updateTooltipPositions();
+  updatePinListMenu();
+});
+
     } // End of initMapAndRealtime
   </script>
 </body>
