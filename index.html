@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
 
   <style>
-    /* Global Button styling for an appealing look */
+    /* Global Button styling */
     button {
       background-color: #4caf50;
       border: none;
@@ -28,7 +28,7 @@
       background-color: #45a049;
       transform: scale(1.05);
     }
-    
+
     /* Basic Page & Map Styling */
     html, body {
       height: 100%;
@@ -40,14 +40,14 @@
       height: 100vh;
       width: 100%;
     }
-    /* Remove default background, border and shadows from Leaflet div icons */
+    /* Remove default styling from Leaflet div icons */
     .leaflet-div-icon {
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
     }
     
-    /* Notifications Container (top-right) */
+    /* Notification Container */
     #notificationContainer {
       position: fixed;
       top: 10px;
@@ -70,7 +70,7 @@
       background-color: #f44336;
     }
     
-    /* Authentication UI Overlay – Sign In Only */
+    /* Authentication Overlay */
     #auth-container {
       position: fixed;
       top: 0;
@@ -84,12 +84,8 @@
       align-items: center;
       justify-content: center;
     }
-    #auth-container h2 {
-      margin-bottom: 10px;
-    }
-    #auth-container form {
-      margin-bottom: 10px;
-    }
+    #auth-container h2 { margin-bottom: 10px; }
+    #auth-container form { margin-bottom: 10px; }
     #auth-container input {
       padding: 8px;
       margin: 4px 0;
@@ -97,7 +93,7 @@
       box-sizing: border-box;
     }
     
-    /* SIDEBAR CONTAINER: Groups the pin list and the button below it */
+    /* SIDEBAR CONTAINER: groups pin list and toggle button */
     #sidebarContainer {
       position: absolute;
       top: 3.5cm;
@@ -106,7 +102,6 @@
     }
     
     /* LEFT SIDE PIN LIST STYLING */
-    /* The sidebar has a semi-transparent background, rounded corners, and subtle box-shadow */
     #pinListMenu {
       width: 7cm;  /* initial width */
       height: 15cm;
@@ -115,13 +110,13 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       border-radius: 4px;
       overflow-y: auto;
-      /* Reduced left padding to 0.2 cm */
+      /* Left padding reduced to 0.2cm */
       padding: 5px 5px 5px 0.2cm;
       font-size: 14px;
       box-sizing: border-box;
       position: relative;
     }
-    /* Resizer element on the right edge of the pin list */
+    /* Resizer on right edge */
     #pinListResizer {
       position: absolute;
       top: 0;
@@ -135,7 +130,7 @@
     #pinListResizer:hover {
       background: #aaa;
     }
-    /* Each pin list item styled using flexbox */
+    /* Pin list items (flex layout) */
     .pin-list-item {
       display: flex;
       align-items: center;
@@ -146,7 +141,7 @@
     .pin-list-item:hover {
       background-color: rgba(0,0,0,0.05);
     }
-    /* Combined marker (icon + pin number) styled like map markers */
+    /* Combined marker (icon + pin number) styling */
     .pin-icon-number {
       display: inline-block;
       margin-right: 5px;
@@ -161,20 +156,20 @@
       text-align: center;
       transition: transform 0.2s ease;
     }
-    /* Pin text styling: preserves newline breaks; if tooltip off, a strikethrough is applied */
+    /* Pin text styling – if tooltip is off, the inline style will add strikethrough */
     .pin-text {
       flex: 1;
       white-space: pre;
       overflow: hidden;
       text-overflow: clip;
     }
-    /* Button below the pin list */
+    /* Button (toggle) below sidebar */
     #sidebarContainer > button {
       margin-top: 0.5cm;
       width: 100%;
     }
     
-    /* SEARCH & LAYER selectors */
+    /* SEARCH and LAYER selectors */
     #searchContainer {
       position: absolute;
       top: 10px;
@@ -311,7 +306,7 @@
     .selected {
       border-color: orange !important;
     }
-    /* Enhanced Marker styles for map icons */
+    /* Enhanced Marker styling for map icons */
     .custom-marker {
       font-size: 10px;
       font-weight: bold;
@@ -380,7 +375,7 @@
   <!-- Notification Container -->
   <div id="notificationContainer"></div>
   
-  <!-- Authentication UI Overlay (Sign In Only) -->
+  <!-- Authentication Overlay -->
   <div id="auth-container">
     <div id="signInContainer">
       <h2>Sign In</h2>
@@ -392,7 +387,7 @@
     </div>
   </div>
   
-  <!-- Main App Content: Sidebar with Pin List and Toggle Button -->
+  <!-- Sidebar: Pin List and Toggle Button -->
   <div id="sidebarContainer">
     <div id="pinListMenu">
       <div id="pinListContent"></div>
@@ -401,11 +396,13 @@
     <button id="toggleAllUtovare">Otvori sve utovare</button>
   </div>
   
+  <!-- Search Container -->
   <div id="searchContainer">
-    <input type="text" id="searchBar" placeholder="Pronađi lokaciju...">
+    <input type="text" id="searchBar" placeholder="Search location...">
     <ul id="searchResults"></ul>
   </div>
   
+  <!-- Layer Selector -->
   <div id="layerSelectContainer">
     <select id="pinLayerSelect"></select>
     <div id="layerButtons">
@@ -416,9 +413,10 @@
     </div>
   </div>
   
+  <!-- Map Container -->
   <div id="map"></div>
   
-  <!-- Hidden File Input for Importing Layers -->
+  <!-- Hidden File Input for Import -->
   <input type="file" id="importLayerInput" style="display: none;" accept="application/json">
   
   <!-- Modal for Custom Pin Form -->
@@ -431,7 +429,7 @@
       <input type="text" id="pinNumber" placeholder="Oznaka kamiona">
       <label for="pinDescription">Detalji:</label>
       <textarea id="pinDescription" placeholder="Količina, težina.."></textarea>
-      <!-- Icon Custom Options Layout -->
+      <!-- Icon Options Layout -->
       <div id="iconCustomOptions">
         <div id="shapeSelection">
           <div class="shape-option" data-shape="square">
@@ -453,8 +451,9 @@
     </div>
   </div>
   
+  <!-- Main JavaScript Code -->
   <script>
-    /**************** Firebase Configuration & Initialization ******************/
+    /* Firebase Config & Initialization */
     const firebaseConfig = {
       apiKey: "AIzaSyDXfhDG2NhylapRByYpE5leAEuIiyHPdBQ",
       authDomain: "nts-air.firebaseapp.com",
@@ -467,7 +466,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     
-    // Notification function
+    // Notification helper
     function showNotification(message, type) {
       const container = document.getElementById("notificationContainer");
       const notif = document.createElement("div");
@@ -476,13 +475,11 @@
       container.appendChild(notif);
       setTimeout(() => {
         notif.style.opacity = 0;
-        setTimeout(() => {
-          container.removeChild(notif);
-        }, 500);
+        setTimeout(() => { container.removeChild(notif); }, 500);
       }, 3000);
     }
     
-    // Authentication UI – Sign In
+    // Authentication: Sign In
     const signInForm = document.getElementById("signInForm");
     signInForm.addEventListener("submit", function(e) {
       e.preventDefault();
@@ -508,7 +505,7 @@
       }
     });
     
-    // Debounce function
+    // Debounce utility
     function debounce(func, delay) {
       let timeout;
       return function(...args) {
@@ -517,17 +514,14 @@
       };
     }
     
-    // Global variable for folder handle
+    // Global variable for file saving
     let saveFolderHandle = null;
-    
     async function saveFile(data, fileName) {
       if (!window.showDirectoryPicker) {
         alert("File System Access API is not supported in this browser.");
         return;
       }
-      if (!saveFolderHandle) {
-        saveFolderHandle = await window.showDirectoryPicker();
-      }
+      if (!saveFolderHandle) { saveFolderHandle = await window.showDirectoryPicker(); }
       const kartaHandle = await saveFolderHandle.getDirectoryHandle("Karta", { create: true });
       const fileHandle = await kartaHandle.getFileHandle(fileName, { create: true });
       const writableStream = await fileHandle.createWritable();
@@ -536,12 +530,9 @@
       alert("File saved successfully to Documents/Karta as " + fileName);
     }
     
-    /**************** Main App: Mapping, Realtime DB & Telematics Integration ****************/
+    /************ Main App: Map, DB, and Telematics Integration ************/
     function initMapAndRealtime() {
-      const map = L.map("map", {
-        center: [45.541, 10.211],
-        zoom: 7,
-      });
+      const map = L.map("map", { center: [45.541, 10.211], zoom: 7 });
       const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "Map data © OpenStreetMap contributors"
       });
@@ -553,7 +544,7 @@
       customPinLayer.addTo(map);
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
-      /**************** NTS Telematics API Integration ****************/
+      /***** NTS Telematics API Integration *****/
       const ccodeAndApiUsername = "t0190-milan";
       const password = "123";
       const ntsLog = new NtsLogin();
@@ -587,7 +578,7 @@
         setInterval(updateVehiclesFromTelematics, 60000);
       });
       
-      /**************** Firebase Realtime Database Integration ****************/
+      /***** Firebase Realtime Database Integration *****/
       let pinLayers = [];
       let activePinLayerId = null;
       let activePinLayer = null;
@@ -595,28 +586,22 @@
       
       function savePinLayersToDatabase() {
         firebase.database().ref("globalMapPinLayers").set(pinLayers, function(error) {
-          if (error) {
-            showNotification("Error saving data: " + error, "error");
-          } else {
-            showNotification("Changes saved", "success");
-          }
+          if (error) { showNotification("Error saving data: " + error, "error"); }
+          else { showNotification("Changes saved", "success"); }
         });
       }
       
       function loadPinLayersFromDatabase() {
         firebase.database().ref("globalMapPinLayers").on("value", function(snapshot) {
           const data = snapshot.val();
-          if (data) {
-            pinLayers = data;
-          } else {
+          if (data) { pinLayers = data; }
+          else {
             const defaultLayer = { id: "layer_default", name: ". nedelja", pins: [] };
             pinLayers = [defaultLayer];
             activePinLayerId = defaultLayer.id;
             savePinLayersToDatabase();
           }
-          if (!activePinLayerId) {
-            activePinLayerId = pinLayers[0].id;
-          }
+          if (!activePinLayerId) { activePinLayerId = pinLayers[0].id; }
           activePinLayer = pinLayers.find(layer => layer.id === activePinLayerId) || pinLayers[0];
           customPins = activePinLayer.pins || [];
           clearCustomPinMarkers();
@@ -632,7 +617,7 @@
         customPinMarkers = {};
       }
       
-      /* UI for Layer Selection & Management */
+      /* Layer Selection UI */
       function updateLayerSelectMenu() {
         const select = document.getElementById("pinLayerSelect");
         select.innerHTML = "";
@@ -641,12 +626,12 @@
           const opt = document.createElement("option");
           opt.value = layer.id;
           opt.textContent = layer.name;
-          if (layer.id === activePinLayerId) opt.selected = true;
+          if (layer.id === activePinLayerId) { opt.selected = true; }
           select.appendChild(opt);
         });
         const optNew = document.createElement("option");
         optNew.value = "create_new";
-        optNew.textContent = "+";
+        optNew.textContent = "Nova nedelja";
         select.appendChild(optNew);
       }
       updateLayerSelectMenu();
@@ -712,14 +697,10 @@
             if (!activePinLayer) {
               throw new Error("No active layer available.");
             }
-            if (!activePinLayer.pins) {
-              activePinLayer.pins = [];
-            }
+            if (!activePinLayer.pins) { activePinLayer.pins = []; }
             if (Array.isArray(importedPins)) {
               importedPins.forEach(pin => {
-                if (typeof pin.tooltipOpened === "undefined") {
-                  pin.tooltipOpened = true;
-                }
+                if (typeof pin.tooltipOpened === "undefined") { pin.tooltipOpened = true; }
                 if (activePinLayer.pins.find(item => item.id === pin.id)) {
                   pin.id = "pin_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
                 }
@@ -767,7 +748,8 @@
         let R = (num >> 16) + amt;
         let G = ((num >> 8) & 0x00FF) + amt;
         let B = (num & 0x0000FF) + amt;
-        return "#" + (0x1000000 + (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
+        return "#" + (0x1000000 +
+          (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
           (G < 255 ? (G < 0 ? 0 : G) : 255) * 0x100 +
           (B < 255 ? (B < 0 ? 0 : B) : 255)
         ).toString(16).slice(1);
@@ -854,12 +836,8 @@
       }
       
       function loadPinsToMap() {
-        if (!customPins || !Array.isArray(customPins)) {
-          customPins = [];
-        }
-        customPins.forEach(pin => {
-          createPinMarker(pin);
-        });
+        if (!customPins || !Array.isArray(customPins)) { customPins = []; }
+        customPins.forEach(pin => { createPinMarker(pin); });
         updatePinListMenu();
       }
       loadPinsToMap();
@@ -869,7 +847,56 @@
         updateTooltipPositions();
       });
       
-      // Update the pin list. If a pin's tooltip is off then apply a strikethrough style.
+      /* SEARCH BAR FUNCTIONALITY, placed here so that "map" is in scope */
+      const searchBar = document.getElementById("searchBar");
+      const searchResults = document.getElementById("searchResults");
+      
+      searchBar.addEventListener("keyup", debounce(function(e) {
+        const query = searchBar.value.trim();
+        if (query.length < 3) {
+          searchResults.style.display = "none";
+          return;
+        }
+        fetch("https://nominatim.openstreetmap.org/search?format=json&limit=5&q=" + encodeURIComponent(query))
+          .then(response => response.json())
+          .then(data => {
+            searchResults.innerHTML = "";
+            if (data.length > 0) {
+              data.forEach(result => {
+                const li = document.createElement("li");
+                li.textContent = result.display_name;
+                li.addEventListener("click", function() {
+                  const lat = parseFloat(result.lat);
+                  const lon = parseFloat(result.lon);
+                  map.setView([lat, lon], 13);
+                  searchBar.value = "";
+                  searchResults.innerHTML = "";
+                  searchResults.style.display = "none";
+                });
+                searchResults.appendChild(li);
+              });
+              searchResults.style.display = "block";
+            } else {
+              searchResults.style.display = "none";
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            searchResults.style.display = "none";
+          });
+      }, 300));
+      
+      searchBar.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (searchResults.firstChild) { searchResults.firstChild.click(); }
+          searchBar.value = "";
+          searchResults.innerHTML = "";
+          searchResults.style.display = "none";
+        }
+      });
+      
+      /* Update Pin List: if a pin’s tooltip is off, its list text gets strikethrough */
       function updatePinListMenu() {
         const content = document.getElementById("pinListContent");
         const sortedPins = customPins.slice().sort((a, b) => {
@@ -888,16 +915,15 @@
         });
         let html = "";
         sortedPins.forEach(pin => {
-          // If tooltip is off, add inline style for strike-through text.
-          let textStyle = pin.tooltipOpened ? "" : "text-decoration: line-through;";
+          // Use inline style if tooltip is off: add strikethrough.
+          const textStyle = pin.tooltipOpened ? "" : "text-decoration: line-through;";
           const iconData = parseIconValue(pin.icon);
           const size = 15;
           const lighter = lightenColor(iconData.color, 20);
           const darker = darkenColor(iconData.color, 20);
-          let iconHtml = '<div class="pin-icon-number" style="background:' + iconData.color + '; background-image: linear-gradient(135deg, ' + lighter + ', ' + darker + ');';
-          if (iconData.shape === "circle") {
-            iconHtml += "border-radius:" + (size / 2) + "px;";
-          }
+          let iconHtml = '<div class="pin-icon-number" style="background:' + iconData.color + 
+                         '; background-image: linear-gradient(135deg, ' + lighter + ', ' + darker + ');';
+          if (iconData.shape === "circle") { iconHtml += "border-radius:" + (size / 2) + "px;"; }
           iconHtml += '">'+ (pin.number || "") + '</div>';
           const textContent = '<span class="pin-text" style="' + textStyle + '">' + pin.title + (pin.description ? ' - ' + pin.description : '') + '</span>';
           html += '<div class="pin-list-item">' + iconHtml + textContent + '</div>';
@@ -905,7 +931,7 @@
         content.innerHTML = html;
       }
       
-      // "Otvori sve utovare" button toggles all pin tooltips on
+      /* "Otvori sve utovare" button: toggle all pin tooltips on */
       document.getElementById("toggleAllUtovare").addEventListener("click", function() {
         for (let id in customPinMarkers) {
           const marker = customPinMarkers[id];
@@ -1006,14 +1032,14 @@
       }
       
       function showContextMenu(pinId, latlng) {
-        const popup = L.popup({ offset: L.point(0,-30) })
-                      .setLatLng(latlng)
-                      .setContent(
-                        '<div class="custom-context-menu">' +
-                          '<a href="#" onclick="editPin(\'' + pinId + '\'); return false;">Izmeni</a>' +
-                          '<a href="#" onclick="deletePin(\'' + pinId + '\'); return false;">Obriši</a>' +
-                        "</div>"
-                      );
+        const popup = L.popup({ offset: L.point(0, -30) })
+                        .setLatLng(latlng)
+                        .setContent(
+                          '<div class="custom-context-menu">' +
+                            '<a href="#" onclick="editPin(\'' + pinId + '\'); return false;">Izmeni</a>' +
+                            '<a href="#" onclick="deletePin(\'' + pinId + '\'); return false;">Obriši</a>' +
+                          '</div>'
+                        );
         popup.openOn(map);
       }
       
@@ -1081,15 +1107,11 @@
       function updateSelectedIconChoices(shape, color) {
         document.querySelectorAll("#shapeSelection .shape-option").forEach(el => {
           el.classList.remove("selected");
-          if (el.getAttribute("data-shape") === shape) {
-            el.classList.add("selected");
-          }
+          if (el.getAttribute("data-shape") === shape) { el.classList.add("selected"); }
         });
         document.querySelectorAll("#colorSelection .color-option").forEach(el => {
           el.classList.remove("selected");
-          if (el.getAttribute("data-color") === color) {
-            el.classList.add("selected");
-          }
+          if (el.getAttribute("data-color") === color) { el.classList.add("selected"); }
         });
         selectedShape = shape;
         selectedColor = color;
@@ -1199,9 +1221,7 @@
             icon: iconType,
             tooltipOpened: true
           };
-          if (!activePinLayer.pins) {
-            activePinLayer.pins = [];
-          }
+          if (!activePinLayer.pins) { activePinLayer.pins = []; }
           activePinLayer.pins.push(pinObj);
           savePinLayersToDatabase();
           createPinMarker(pinObj);
@@ -1212,10 +1232,10 @@
       document.getElementById("cancelPinBtn").addEventListener("click", function() {
         hidePinForm();
       });
-    } // End of initMapAndRealtime
+    } // End initMapAndRealtime
   </script>
   
-  <!-- DOMContentLoaded block for Pin List Resizer -->
+  <!-- DOMContentLoaded block for Resizer functionality -->
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const pinList = document.getElementById("pinListMenu");
@@ -1249,7 +1269,7 @@
         document.documentElement.removeEventListener("mouseup", stopDrag, false);
       }
       
-      // Auto-adjust on double-click: measure the widest pin text and set width accordingly
+      // On double-click, auto-adjust the width based on widest pin text
       resizer.addEventListener("dblclick", function(e) {
         const listItems = document.querySelectorAll("#pinListContent .pin-text");
         let maxContentWidth = 0;
