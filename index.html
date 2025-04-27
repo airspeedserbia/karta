@@ -449,8 +449,8 @@
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
 
       /**************** NTS Telematics API Integration ****************/
-      var ccodeAndApiUsername = "t0190-api.marko";
-      var password = "marko2024";
+      var ccodeAndApiUsername = "t0190-timocom";
+      var password = "123";
       var ntsLog = new NtsLogin();
       ntsLog.login("https://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function () {
         console.log("Telematics API login successful!");
