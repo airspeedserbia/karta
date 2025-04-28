@@ -378,14 +378,28 @@
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-auth-compat.js"></script>
   
-  <!-- Override XMLHttpRequest to send credentials for telematics API -->
+  <!-- Override XMLHttpRequest to automatically set credentials and required header for NTS API -->
   <script>
-    (function(open) {
+    (function() {
+      const originalOpen = XMLHttpRequest.prototype.open;
       XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-        this.withCredentials = true;
-        open.call(this, method, url, async, user, password);
+         this.withCredentials = true;
+         this._ntsUrl = url;
+         return originalOpen.call(this, method, url, async, user, password);
       };
-    })(XMLHttpRequest.prototype.open);
+
+      const originalSend = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.send = function(data) {
+         if (this._ntsUrl && this._ntsUrl.includes("app.nts-international.net")) {
+           try {
+             this.setRequestHeader("nts-application", "nts-rest-api");
+           } catch(e) {
+             console.error("Error setting nts-application header:", e);
+           }
+         }
+         return originalSend.call(this, data);
+      };
+    })();
   </script>
 </head>
 <body>
@@ -564,16 +578,16 @@
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
       /***** NTS Telematics API Integration *****/
-      // Use HTTP as per API documentation
-      const ccodeAndApiUsername = "t0190-transporeon.api"; // ccode-apiusername format
+      // Credentials: ccode-apiusername and password as specified.
+      const ccodeAndApiUsername = "t0190-transporeon.api"; 
       const password = "airspeed2024";
       const ntsLog = new NtsLogin();
       ntsLog.login("https://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function() {
         console.log("Telematics API login successful!");
-        // Instantiate the API using the base URL (the library will use /ntsapi for its calls)
+        // Instantiate the API using the HTTPS base URL
         window.api = new NTSApi("https://app.nts-international.net");
         
-        // Fetch vehicle data – optionally, you can append ?version=2 in the call if needed by your integration
+        // Fetch vehicle data – appending ?version=2 (if needed)
         function updateVehiclesFromTelematics() {
           vehicleLayer.clearLayers();
           console.log("Fetching all vehicles...");
