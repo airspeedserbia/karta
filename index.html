@@ -569,7 +569,6 @@
     }
     
     /************ Telematics Integration & Map Setup ************/
-    // Manual login function using fetch
     function performNTSLogin(ccodeAndApiUsername, password, callback) {
       const endpoint = "https://app.nts-international.net/NTSSecurity/login";
       const basicAuth = "Basic " + btoa(ccodeAndApiUsername + ":" + password);
@@ -610,14 +609,21 @@
       customPinLayer.addTo(map);
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
-      /***** NTS Telematics API Integration *****/
-      const ccodeAndApiUsername = "t0190-transporeon.api"; // Format: ccode-apiusername
+      // Telematics API integration
+      const ccodeAndApiUsername = "t0190-transporeon.api";
       const tsPassword = "airspeed2024";
       performNTSLogin(ccodeAndApiUsername, tsPassword, function() {
         // After login, instantiate the NTS API object.
         window.api = new NTSApi("https://app.nts-international.net");
         
-        // Function to fetch vehicle data; appending ?version=2 returns full data.
+        // Override allvehicles to include version=2 in its URL
+        if (window.api && typeof window.api.allvehicles === "function") {
+          window.api.allvehicles = function(callback) {
+            this.request("GET", "/ntsapi/allvehicles?version=2", callback);
+          };
+        }
+        
+        // Function to fetch vehicle data
         function updateVehiclesFromTelematics() {
           vehicleLayer.clearLayers();
           console.log("Fetching all vehicles...");
@@ -629,6 +635,7 @@
             }
             vehicles.forEach(vehicle => {
               console.log("Processing vehicle with id:", vehicle.id);
+              // Note: The version parameter for vehiclestate is still passed as 2
               api.vehiclestate(vehicle.id, "UTC", 2, false, false, function(state) {
                 console.log("Vehicle state for id", vehicle.id, ":", state);
                 if (state && state.gpsLat && state.gpsLon) {
