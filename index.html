@@ -96,22 +96,22 @@
     /* SIDEBAR CONTAINER: groups pin list and toggle button */
     #sidebarContainer {
       position: absolute;
-      top: 3.5cm;
-      left: 0.5cm;
+      top: 3rem; /* changed from 3.5cm */
+      left: 1rem; /* changed from 0.5cm */
       z-index: 10000;
     }
     
     /* LEFT SIDE PIN LIST STYLING */
     #pinListMenu {
-      width: 7cm;  /* initial width */
-      height: 15cm;
+      width: 80%;         /* changed from 7cm */
+      max-width: 300px;    /* added for limiting size on larger screens */
+      height: auto;        /* changed from 15cm */
       background: rgba(255,255,255,0.5);
       border: 1px solid #ccc;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       border-radius: 4px;
       overflow-y: auto;
-      /* Left padding reduced to 0.2cm */
-      padding: 5px 5px 5px 0.2cm;
+      padding: 5px 5px 5px 0.2rem; /* changed from 0.2cm on the left */
       font-size: 14px;
       box-sizing: border-box;
       position: relative;
@@ -165,7 +165,7 @@
     }
     /* Button (toggle) below sidebar */
     #sidebarContainer > button {
-      margin-top: 0.5cm;
+      margin-top: 0.5rem; /* changed from 0.5cm */
       width: 100%;
     }
     
@@ -173,9 +173,10 @@
     #searchContainer {
       position: absolute;
       top: 10px;
-      left: 2cm;
+      left: 1rem; /* changed from 2cm */
       z-index: 10001;
-      width: 375px;
+      width: calc(100% - 2rem); /* ensures responsiveness */
+      max-width: 375px;
     }
     #searchBar {
       width: 100%;
@@ -345,6 +346,23 @@
     .custom-context-menu a:hover {
       background-color: #f9f9f9;
       color: #000;
+    }
+
+    /* Media Query for smaller screens */
+    @media only screen and (max-width: 600px) {
+      #sidebarContainer {
+        top: 1rem;
+        left: 0.5rem;
+      }
+      #pinListMenu {
+        width: 90%;
+        max-width: none;
+        margin-bottom: 1rem;
+      }
+      #searchContainer {
+        left: 0.5rem;
+        width: calc(100% - 1rem);
+      }
     }
   </style>
   
@@ -915,7 +933,6 @@
         });
         let html = "";
         sortedPins.forEach(pin => {
-          // Use inline style if tooltip is off: add strikethrough.
           const textStyle = pin.tooltipOpened ? "" : "text-decoration: line-through;";
           const iconData = parseIconValue(pin.icon);
           const size = 15;
@@ -1240,7 +1257,6 @@
     document.addEventListener("DOMContentLoaded", function() {
       const pinList = document.getElementById("pinListMenu");
       const resizer = document.getElementById("pinListResizer");
-      // Ensure pointer events are enabled
       resizer.style.pointerEvents = "all";
       
       let startX, startWidth;
@@ -1269,7 +1285,6 @@
         document.documentElement.removeEventListener("mouseup", stopDrag, false);
       }
       
-      // On double-click, auto-adjust the width based on widest pin text
       resizer.addEventListener("dblclick", function(e) {
         const listItems = document.querySelectorAll("#pinListContent .pin-text");
         let maxContentWidth = 0;
@@ -1283,7 +1298,7 @@
           if (width > maxContentWidth) maxContentWidth = width;
           document.body.removeChild(clone);
         });
-        const extraSpace = 40; // additional space for icon and padding
+        const extraSpace = 40;
         let newWidth = maxContentWidth + extraSpace;
         if (newWidth < minWidth) newWidth = minWidth;
         if (newWidth > maxWidth) newWidth = maxWidth;
