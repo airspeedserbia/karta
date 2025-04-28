@@ -616,12 +616,26 @@
         // After login, instantiate the NTS API object.
         window.api = new NTSApi("https://app.nts-international.net");
         
-        // Override allvehicles to include version=2 in its URL
-        if (window.api && typeof window.api.allvehicles === "function") {
-          window.api.allvehicles = function(callback) {
-            this.request("GET", "/ntsapi/allvehicles?version=2", callback);
-          };
-        }
+if (window.api && typeof window.api.allvehicles === "function") {
+  window.api.allvehicles = function(callback) {
+    fetch("https://app.nts-international.net/ntsapi/allvehicles?version=2", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "nts-application": "nts-rest-api"
+      }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP error " + res.status);
+      return res.json();
+    })
+    .then(data => callback(data))
+    .catch(error => {
+      console.error("Error fetching all vehicles:", error);
+      callback(null);
+    });
+  };
+}
         
         // Function to fetch vehicle data
         function updateVehiclesFromTelematics() {
