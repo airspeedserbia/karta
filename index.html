@@ -93,7 +93,7 @@
       box-sizing: border-box;
     }
     
-    /* SIDEBAR CONTAINER: groups pin list and toggle button */
+    /* SIDEBAR CONTAINER: groups pin list only */
     #sidebarContainer {
       position: absolute;
       top: 10%;
@@ -162,17 +162,12 @@
       overflow: hidden;
       text-overflow: clip;
     }
-    /* Button (toggle) below sidebar */
-    #sidebarContainer > button {
-      margin-top: 20px;
-      width: 100%;
-    }
     
     /* SEARCH and LAYER selectors */
     #searchContainer {
       position: absolute;
       top: 10px;
-      left: 50px;
+      left: 200px;
       z-index: 10001;
       width: 80%;
       max-width: 375px;
@@ -348,6 +343,14 @@
       color: #000;
     }
     
+    /* Style for Toggle Button moved to bottom left */
+    #toggleAllUtovare {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      z-index: 10000;
+    }
+    
     /* Responsive styles */
     @media (max-width: 768px) {
       #sidebarContainer {
@@ -357,9 +360,6 @@
       #pinListMenu {
           width: 180px;
           height: 250px;
-      }
-      #sidebarContainer > button {
-          margin-top: 15px;
       }
       #searchContainer {
           left: 10%;
@@ -414,14 +414,16 @@
     </div>
   </div>
   
-  <!-- Sidebar: Pin List and Toggle Button -->
+  <!-- Sidebar: Pin List -->
   <div id="sidebarContainer">
     <div id="pinListMenu">
       <div id="pinListContent"></div>
       <div id="pinListResizer"></div>
     </div>
-    <button id="toggleAllUtovare">Otvori sve utovare</button>
   </div>
+
+  <!-- Toggle Button (positioned in the bottom left corner) -->
+  <button id="toggleAllUtovare">Otvori sve utovare</button>
   
   <!-- Search Container -->
   <div id="searchContainer">
@@ -942,6 +944,7 @@
         });
         let html = "";
         sortedPins.forEach(pin => {
+          // Use inline style if tooltip is off: add strikethrough.
           const textStyle = pin.tooltipOpened ? "" : "text-decoration: line-through;";
           const iconData = parseIconValue(pin.icon);
           const size = 15;
