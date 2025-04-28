@@ -28,7 +28,6 @@
       background-color: #45a049;
       transform: scale(1.05);
     }
-
     /* Basic Page & Map Styling */
     html, body {
       height: 100%;
@@ -40,13 +39,11 @@
       height: 100vh;
       width: 100%;
     }
-    /* Remove default styling from Leaflet div icons */
     .leaflet-div-icon {
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
     }
-    
     /* Notification Container */
     #notificationContainer {
       position: fixed;
@@ -69,7 +66,6 @@
     .notification.error {
       background-color: #f44336;
     }
-    
     /* Authentication Overlay */
     #auth-container {
       position: fixed;
@@ -92,7 +88,6 @@
       width: 250px;
       box-sizing: border-box;
     }
-    
     /* SIDEBAR CONTAINER: groups pin list only */
     #sidebarContainer {
       position: absolute;
@@ -100,11 +95,10 @@
       left: 10px;
       z-index: 10000;
     }
-    
     /* LEFT SIDE PIN LIST STYLING */
     #pinListMenu {
-      width: 220px;  /* roughly replacing 7cm */
-      height: 300px; /* instead of 15cm */
+      width: 220px;
+      height: 300px;
       background: rgba(255,255,255,0.5);
       border: 1px solid #ccc;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -162,7 +156,6 @@
       overflow: hidden;
       text-overflow: clip;
     }
-    
     /* SEARCH and LAYER selectors */
     #searchContainer {
       position: absolute;
@@ -219,7 +212,6 @@
       display: inline-block;
       margin-left: 30px;
     }
-    
     /* Modal for Custom Pin Form */
     #pinFormModal {
       display: none;
@@ -342,7 +334,6 @@
       background-color: #f9f9f9;
       color: #000;
     }
-    
     /* Style for Toggle Button moved to bottom left */
     #toggleAllUtovare {
       position: fixed;
@@ -350,7 +341,6 @@
       left: 10px;
       z-index: 10000;
     }
-    
     /* Responsive styles */
     @media (max-width: 768px) {
       #sidebarContainer {
@@ -376,8 +366,8 @@
   </style>
   
   <!-- Telematics API Libraries -->
-  <script src="https://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
-  <script src="https://app.nts-international.net/com/nts/js/nts-api.js"></script>
+  <script src="http://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
+  <script src="http://app.nts-international.net/com/nts/js/nts-api.js"></script>
   
   <!-- Leaflet & MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -574,12 +564,16 @@
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
       /***** NTS Telematics API Integration *****/
-      const ccodeAndApiUsername = "t0190-transporeon.api";
+      // Use HTTP as per API documentation
+      const ccodeAndApiUsername = "t0190-transporeon.api"; // ccode-apiusername format
       const password = "airspeed2024";
       const ntsLog = new NtsLogin();
-      ntsLog.login("https://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function() {
+      ntsLog.login("http://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function() {
         console.log("Telematics API login successful!");
-        window.api = new NTSApi("https://app.nts-international.net");
+        // Instantiate the API using the base URL (the library will use /ntsapi for its calls)
+        window.api = new NTSApi("http://app.nts-international.net");
+        
+        // Fetch vehicle data – optionally, you can append ?version=2 in the call if needed by your integration
         function updateVehiclesFromTelematics() {
           vehicleLayer.clearLayers();
           console.log("Fetching all vehicles...");
@@ -876,7 +870,7 @@
         updateTooltipPositions();
       });
       
-      /* SEARCH BAR FUNCTIONALITY, placed here so that "map" is in scope */
+      /* SEARCH BAR FUNCTIONALITY */
       const searchBar = document.getElementById("searchBar");
       const searchResults = document.getElementById("searchResults");
       
@@ -925,7 +919,7 @@
         }
       });
       
-      /* Update Pin List: if a pin’s tooltip is off, its list text gets strikethrough */
+      /* Update Pin List */
       function updatePinListMenu() {
         const content = document.getElementById("pinListContent");
         const sortedPins = customPins.slice().sort((a, b) => {
@@ -944,7 +938,6 @@
         });
         let html = "";
         sortedPins.forEach(pin => {
-          // Use inline style if tooltip is off: add strikethrough.
           const textStyle = pin.tooltipOpened ? "" : "text-decoration: line-through;";
           const iconData = parseIconValue(pin.icon);
           const size = 15;
@@ -960,7 +953,7 @@
         content.innerHTML = html;
       }
       
-      /* "Otvori sve utovare" button: toggle all pin tooltips on */
+      /* Toggle all pin tooltips */
       document.getElementById("toggleAllUtovare").addEventListener("click", function() {
         for (let id in customPinMarkers) {
           const marker = customPinMarkers[id];
@@ -1269,7 +1262,6 @@
     document.addEventListener("DOMContentLoaded", function() {
       const pinList = document.getElementById("pinListMenu");
       const resizer = document.getElementById("pinListResizer");
-      // Ensure pointer events are enabled
       resizer.style.pointerEvents = "all";
       
       let startX, startWidth;
@@ -1312,7 +1304,7 @@
           if (width > maxContentWidth) maxContentWidth = width;
           document.body.removeChild(clone);
         });
-        const extraSpace = 40; // additional space for icon and padding
+        const extraSpace = 40;
         let newWidth = maxContentWidth + extraSpace;
         if (newWidth < minWidth) newWidth = minWidth;
         if (newWidth > maxWidth) newWidth = maxWidth;
