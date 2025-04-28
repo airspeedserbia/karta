@@ -571,7 +571,7 @@
     /************ Telematics Integration & Map Setup ************/
     // Manual login function using fetch
     function performNTSLogin(ccodeAndApiUsername, password, callback) {
-      const endpoint = "https://app.nts-international.net/NTSSecurity/login";
+      const endpoint = "http://app.nts-international.net/NTSSecurity/login";
       const basicAuth = "Basic " + btoa(ccodeAndApiUsername + ":" + password);
       fetch(endpoint, {
         method: 'POST',
@@ -615,7 +615,7 @@
       const tsPassword = "airspeed2024";
       performNTSLogin(ccodeAndApiUsername, tsPassword, function() {
         // After login, instantiate the NTS API object.
-        window.api = new NTSApi("https://app.nts-international.net");
+        window.api = new NTSApi("http://app.nts-international.net");
         
         // Function to fetch vehicle data; appending ?version=2 returns full data.
         function updateVehiclesFromTelematics() {
