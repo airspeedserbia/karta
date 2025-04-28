@@ -96,22 +96,21 @@
     /* SIDEBAR CONTAINER: groups pin list and toggle button */
     #sidebarContainer {
       position: absolute;
-      top: 3.5cm;
-      left: 0.5cm;
+      top: 10%;
+      left: 10px;
       z-index: 10000;
     }
     
     /* LEFT SIDE PIN LIST STYLING */
     #pinListMenu {
-      width: 7cm;  /* initial width */
-      height: 15cm;
+      width: 220px;  /* roughly replacing 7cm */
+      height: 300px; /* instead of 15cm */
       background: rgba(255,255,255,0.5);
       border: 1px solid #ccc;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       border-radius: 4px;
       overflow-y: auto;
-      /* Left padding reduced to 0.2cm */
-      padding: 5px 5px 5px 0.2cm;
+      padding: 5px;
       font-size: 14px;
       box-sizing: border-box;
       position: relative;
@@ -165,7 +164,7 @@
     }
     /* Button (toggle) below sidebar */
     #sidebarContainer > button {
-      margin-top: 0.5cm;
+      margin-top: 20px;
       width: 100%;
     }
     
@@ -173,9 +172,10 @@
     #searchContainer {
       position: absolute;
       top: 10px;
-      left: 2cm;
+      left: 200px;
       z-index: 10001;
-      width: 375px;
+      width: 80%;
+      max-width: 375px;
     }
     #searchBar {
       width: 100%;
@@ -242,7 +242,8 @@
       background: #fff;
       padding: 20px;
       border-radius: 12px;
-      width: 320px;
+      width: 90%;
+      max-width: 320px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.4);
     }
     #pinFormModal label {
@@ -345,6 +346,32 @@
     .custom-context-menu a:hover {
       background-color: #f9f9f9;
       color: #000;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      #sidebarContainer {
+          top: 5%;
+          left: 5px;
+      }
+      #pinListMenu {
+          width: 180px;
+          height: 250px;
+      }
+      #sidebarContainer > button {
+          margin-top: 15px;
+      }
+      #searchContainer {
+          left: 10%;
+          width: 90%;
+      }
+      #layerSelectContainer {
+          top: 5px;
+      }
+      #pinFormModal .modal-content {
+          width: 95%;
+          max-width: 280px;
+      }
     }
   </style>
   
@@ -915,7 +942,6 @@
         });
         let html = "";
         sortedPins.forEach(pin => {
-          // Use inline style if tooltip is off: add strikethrough.
           const textStyle = pin.tooltipOpened ? "" : "text-decoration: line-through;";
           const iconData = parseIconValue(pin.icon);
           const size = 15;
