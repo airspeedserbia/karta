@@ -164,10 +164,14 @@
       text-overflow: clip;
     }
     /* Button (toggle) below sidebar */
-    #sidebarContainer > button {
-      margin-top: 0.5rem; /* changed from 0.5cm */
-      width: 100%;
-    }
+#toggleAllUtovare {
+  position: fixed;
+  bottom: 10px; /* Moves button to the bottom of the screen */
+  left: 50%; /* Centers the button horizontally */
+  transform: translateX(-50%); /* Corrects centering */
+  width: auto; /* Adjust the button's width to fit the content */
+  z-index: 10000; /* Ensures it stays on top of other elements */
+}
     
     /* SEARCH and LAYER selectors */
     #searchContainer {
@@ -406,11 +410,13 @@
   </div>
   
   <!-- Sidebar: Pin List and Toggle Button -->
-  <div id="sidebarContainer">
-    <div id="pinListMenu">
-      <div id="pinListContent"></div>
-      <div id="pinListResizer"></div>
-    </div>
+<div id="sidebarContainer">
+  <div id="pinListMenu">
+    <div id="pinListContent"></div>
+    <div id="pinListResizer"></div>
+  </div>
+</div>
+<button id="toggleAllUtovare">Otvori sve utovare</button>
     <button id="toggleAllUtovare">Otvori sve utovare</button>
   </div>
   
