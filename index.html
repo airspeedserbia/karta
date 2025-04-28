@@ -366,8 +366,8 @@
   </style>
   
   <!-- Telematics API Libraries -->
-  <script src="http://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
-  <script src="http://app.nts-international.net/com/nts/js/nts-api.js"></script>
+  <script src="https://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
+  <script src="https://app.nts-international.net/com/nts/js/nts-api.js"></script>
   
   <!-- Leaflet & MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -568,10 +568,10 @@
       const ccodeAndApiUsername = "t0190-transporeon.api"; // ccode-apiusername format
       const password = "airspeed2024";
       const ntsLog = new NtsLogin();
-      ntsLog.login("http://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function() {
+      ntsLog.login("https://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function() {
         console.log("Telematics API login successful!");
         // Instantiate the API using the base URL (the library will use /ntsapi for its calls)
-        window.api = new NTSApi("http://app.nts-international.net");
+        window.api = new NTSApi("https://app.nts-international.net");
         
         // Fetch vehicle data – optionally, you can append ?version=2 in the call if needed by your integration
         function updateVehiclesFromTelematics() {
