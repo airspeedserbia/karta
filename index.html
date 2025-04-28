@@ -610,8 +610,8 @@
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
       // Telematics API integration
-      const ccodeAndApiUsername = "t0190-transporeon.api";
-      const tsPassword = "airspeed2024";
+      const ccodeAndApiUsername = "t0190-marko";
+      const tsPassword = "Airspeed1";
       performNTSLogin(ccodeAndApiUsername, tsPassword, function() {
         // After login, instantiate the NTS API object.
         window.api = new NTSApi("https://app.nts-international.net");
