@@ -574,8 +574,8 @@
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
       /***** NTS Telematics API Integration *****/
-      const ccodeAndApiUsername = "t0190-timocom";
-      const password = "123";
+      const ccodeAndApiUsername = "t0190-transporeon.api";
+      const password = "airspeed2024";
       const ntsLog = new NtsLogin();
       ntsLog.login("https://app.nts-international.net/NTSSecurity/login", ccodeAndApiUsername, password, function() {
         console.log("Telematics API login successful!");
