@@ -142,8 +142,8 @@
       border: 2px solid rgba(255,255,255,0.8);
       box-shadow: 0 1px 3px rgba(0,0,0,0.3);
       line-height: 15px;
-      width: 15px;
-      height: 15px;
+      width: 18px;
+      height: 18px;
       text-align: center;
       transition: transform 0.2s ease;
     }
@@ -174,8 +174,6 @@
       background-color: white !important;
       opacity: 1 !important;
       border: 1px solid #ccc !important;
-}
-
     }
     #searchBar:focus {
       outline: none;
@@ -205,19 +203,20 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 10001;
-    }
-    #layerSelectContainer select { 
-      padding: 5px; font-size: 14px; 
-      background-color: white !important;
-      opacity: 1 !important;
-      border: 1px solid #ccc !important;
 
     }
-    #layerButtons { display: inline-block; margin-left: 30px; }
+    #layerSelectContainer select { 
+      padding: 5px; font-size: 14px;
+      background-color: white !important;
+      opacity: 1 !important;
+      border: 1px solid #ccc !important;}
+    
+    #layerButtons { display: inline-block; margin-left: 60px; }
     
     /* Modal for Custom Pin Form */
     #pinFormModal {
       display: none;
+      margin-bottom: 4px;
       position: fixed;
       top: 0;
       left: 0;
@@ -228,20 +227,28 @@
       align-items: center;
       justify-content: center;
     }
-    #pinFormModal .modal-content {
-      width: 80% !important; /* Reduce width */
-      max-width: 280px !important; /* Set a smaller max-width */
-      padding: 15px !important; /* Reduce padding */
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 320px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-    }
-    #pinFormModal label { font-weight: bold; }
+#pinFormModal .modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 370px;
+  min-height: auto;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+    #pinFormModal label { font-weight: bold; line-height: 1.2; }
     #pinFormModal input[type="text"],
-    #pinFormModal textarea { width: 100%; margin-bottom: 10px; box-sizing: border-box; }
+    #pinFormModal textarea { 
+      width: 100%;
+       margin-bottom: 6px;
+      box-sizing: border-box;
+      overflow-y: hidden; /* Ensure no scrolling */
+      height: 40px !important;         /* Set a fixed height */
+      line-height: 40px;     /* Match the line-height to center the text vertically */
+      text-align: left;    /* Center the text horizontally */
+      padding: 0;           /* Remove extra padding that might offset centering */
+      resize: none;         /* Optional: disable resizing if needed */
+    }
     
     /* Icon Custom Options Layout */
     #iconCustomOptions {
@@ -254,8 +261,8 @@
       border-right: 1px solid #ccc;
     }
     .shape-option {
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -263,71 +270,95 @@
       cursor: pointer;
       border: 1px solid #ccc;
     }
+}
+
     #colorSelection {
       padding: 0 5px;
       border-right: 1px solid #ccc;
     }
-    #colorSelection table { border-collapse: collapse; }
-    #colorSelection td { padding: 0; margin: 0; }
-    .color-option {
+    #colorSelection table {   margin-left: 15px; width: 135px; height: 80px; border-collapse: collapse; }
+    #colorSelection td { 
+      padding: 0; 
+      margin: 0; 
+      height: 15px;
+      vertical-align: middle; /* Ensures alignment doesn’t distort height */
+    }
+
+    }
+     .color-option {
+      line-height: 15px;
       width: 15px;
       height: 15px;
       cursor: pointer;
-      border: 1px solid #ccc;
+      border: 0 solid #ccc;
       display: inline-block;
+      box-sizing: border-box; /* Ensures padding/margins don’t affect size */
     }
-    #iconPreview { padding-left: 5px; }
-    #previewWindow {
-      width: 100px;
-      height: 100px;
-      border: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .selected { border-color: orange !important; }
-    
-    /* Enhanced Marker styling for map icons */
-    .custom-marker {
-      font-size: 10px;
-      font-weight: bold;
-      color: white;
-      border: 2px solid rgba(255,255,255,0.8);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .custom-marker:hover {
-      transform: scale(1.2);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-    
-    /* Tooltip styling */
-    .custom-tooltip {
-      background: rgba(0,0,0,0.8);
-      color: white;
-      padding: 5px;
-      border-radius: 3px;
-      font-size: 12px;
-    }
-    
-    /* Context Menu Styling */
-    .custom-context-menu {
-      text-align: center;
-      font-size: 14px;
-    }
-    .custom-context-menu a {
-      display: block;
-      padding: 6px 10px;
-      color: #333;
-      text-decoration: none;
-      border-bottom: 1px solid #eee;
-    }
-    .custom-context-menu a:last-child { border-bottom: none; }
-    .custom-context-menu a:hover {
-      background-color: #f9f9f9;
-      color: #000;
-    }
-    
+
+#Iconpreview {
+  height: 60px;
+  width: 60px;
+  padding-left: 0;
+}    
+#previewWindow {
+  margin-left: 15px;
+  height:80px;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selected {
+  border-color: orange !important;
+}
+
+/* Enhanced Marker styling for map icons */
+.custom-marker {
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  border: 2px solid rgba(255,255,255,0.8);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-marker:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* Tooltip styling */
+.custom-tooltip {
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* Context Menu Styling */
+.custom-context-menu {
+  text-align: center;
+  font-size: 14px;
+}
+
+.custom-context-menu a {
+  display: block;
+  padding: 6px 10px;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid #eee;
+}
+
+.custom-context-menu a:last-child {
+  border-bottom: none;
+}
+
+.custom-context-menu a:hover {
+  background-color: #f9f9f9;
+  color: #000;
+}   
     /* Toggle Button (bottom left) */
     #toggleAllUtovare {
       position: fixed;
@@ -490,10 +521,10 @@
       <div id="iconCustomOptions">
         <div id="shapeSelection">
           <div class="shape-option" data-shape="square">
-            <div style="width:30px; height:30px; border:1px solid gray;"></div>
+            <div style="width:40px; height:40px; border:1px solid gray;"></div>
           </div>
           <div class="shape-option" data-shape="circle">
-            <div style="width:30px; height:30px; border:1px solid gray; border-radius:50%;"></div>
+            <div style="width:40px; height:40px; border:1px solid gray; border-radius:50%;"></div>
           </div>
         </div>
         <div id="colorSelection">
@@ -940,7 +971,7 @@
         return { color: parts[0], shape: parts[1] };
       }
       function getMarkerSize() {
-        const baseSize = 20;
+        const baseSize = 22;
         // Use the current globalMap zoom level
         const zoomDiff = globalMap.getZoom() - 13;
         const factor = 1.0366;
@@ -952,7 +983,7 @@
         const darker = darkenColor(iconData.color, 20);
         let inlineStyle = "background: " + iconData.color + "; background-image: linear-gradient(135deg, " 
                         + lighter + ", " + darker + "); width:" + size + "px; height:" + size 
-                        + "px; line-height:" + size + "px; text-align:center;";
+                        + "px; line-height: 15px;" + "px; text-align:center;";
         if (iconData.shape === "circle") {
           inlineStyle += "border-radius:" + (size / 2) + "px;";
         }
@@ -1131,7 +1162,7 @@
         const pin = customPins.find(item => item.id === pinId);
         if (pin) {
           currentEditingPinId = pinId;
-          document.getElementById("modalHeader").textContent = "Edit Custom Pin";
+          document.getElementById("modalHeader").textContent = "";
           document.getElementById("pinTitle").value = pin.title;
           document.getElementById("pinNumber").value = pin.number;
           document.getElementById("pinDescription").value = pin.description;
@@ -1165,6 +1196,7 @@
         const previewWindow = document.getElementById("previewWindow");
         const lighter = lightenColor(selectedColor, 20);
         const darker = darkenColor(selectedColor, 20);
+        const size = 60; // New desired diameter
         let style = "background: " + selectedColor + "; background-image: linear-gradient(135deg, " 
                   + lighter + ", " + darker + "); width:100px; height:100px; line-height:100px;";
         if (selectedShape === "circle") {
