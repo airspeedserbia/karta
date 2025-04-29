@@ -232,21 +232,26 @@
   padding: 20px;
   border-radius: 12px;
   width: 90%;
-  max-width: auto;
+  max-width: 370px;
   min-height: auto;
   box-shadow: 0 6px 12px rgba(0,0,0,0.4);
 }
     #pinFormModal label { font-weight: bold; line-height: 1.2; }
     #pinFormModal input[type="text"],
     #pinFormModal textarea { 
+      display: flex;
+      align-items: center;
+      justify-content: left; /* Adjust as needed */
+      padding: 0 5px; /* Ensures spacing without shifting text position */
+      box-sizing: border-box;
+      height: 40px;
       width: 100%;
-       margin-bottom: 6px;
+      margin-bottom: 6px;
       box-sizing: border-box;
       overflow-y: hidden; /* Ensure no scrolling */
       height: 40px !important;         /* Set a fixed height */
       line-height: 40px;     /* Match the line-height to center the text vertically */
       text-align: left;    /* Center the text horizontally */
-      padding: 0;           /* Remove extra padding that might offset centering */
       resize: none;         /* Optional: disable resizing if needed */
     }
     
