@@ -322,13 +322,57 @@
       z-index: 10000;
     }
     
-    /* Responsive styles */
+    /* Responsive styles for tablets */
     @media (max-width: 768px) {
       #sidebarContainer { top: 5%; left: 5px; }
       #pinListMenu { width: 180px; height: 250px; }
       #searchContainer { left: 10%; width: 90%; }
       #layerSelectContainer { top: 5px; }
       #pinFormModal .modal-content { width: 95%; max-width: 280px; }
+    }
+    
+    /* Additional Mobile Styles for smartphones */
+    @media only screen and (max-width: 600px) {
+      /* Adjust sidebar to use a larger relative width */
+      #sidebarContainer {
+        top: 5px;
+        left: 5%;
+        width: 90%;
+      }
+      #pinListMenu {
+        width: 90%;
+        height: auto;
+        max-height: 200px;
+      }
+      /* Place search container closer to screen edges */
+      #searchContainer {
+        top: 5px;
+        left: 5%;
+        width: 90%;
+      }
+      /* Reposition the layer selector to appear below the search bar */
+      #layerSelectContainer {
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      /* Center the toggle button */
+      #toggleAllUtovare {
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      button {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+      #auth-container input {
+        width: 90%;
+      }
+      #pinFormModal .modal-content {
+        width: 95%;
+        max-width: 300px;
+      }
     }
   </style>
   
@@ -593,7 +637,7 @@
         window.api = new NTSApi("https://app.nts-international.net");
         if (window.api && typeof window.api.allvehicles === "function") {
           window.api.allvehicles = function(callback) {
-            fetch("https://app.nts-international.net/ntsapi/allvehicles?version=2.3", {
+            fetch("https://app.nts-international.net/ntsapi/allvehicles?version=2", {
               method: "GET",
               credentials: "include",
               headers: { "nts-application": "nts-rest-api" }
