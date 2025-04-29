@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Air Speed - KARTA</title>
-  
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <!-- MarkerCluster CSS -->
@@ -28,7 +28,6 @@
       background-color: #45a049;
       transform: scale(1.05);
     }
-    
     /* Basic Page & Map Styling */
     html, body {
       height: 100%;
@@ -45,7 +44,6 @@
       border: none !important;
       box-shadow: none !important;
     }
-    
     /* Notification Container */
     #notificationContainer {
       position: fixed;
@@ -64,7 +62,6 @@
     }
     .notification.success { background-color: #4caf50; }
     .notification.error { background-color: #f44336; }
-    
     /* Authentication Overlay */
     #auth-container {
       position: fixed;
@@ -87,7 +84,6 @@
       width: 250px;
       box-sizing: border-box;
     }
-    
     /* SIDEBAR CONTAINER: groups pin list only */
     #sidebarContainer {
       position: absolute;
@@ -121,7 +117,6 @@
       z-index: 10001;
     }
     #pinListResizer:hover { background: #aaa; }
-    
     /* Pin list items */
     .pin-list-item {
       display: flex;
@@ -153,7 +148,6 @@
       overflow: hidden;
       text-overflow: clip;
     }
-    
     /* SEARCH and LAYER selectors */
     #searchContainer {
       position: absolute;
@@ -193,7 +187,6 @@
       cursor: pointer;
     }
     #searchResults li:hover { background: #f0f0f0; }
-    
     #layerSelectContainer {
       position: absolute;
       top: 10px;
@@ -203,7 +196,6 @@
     }
     #layerSelectContainer select { padding: 5px; font-size: 14px; }
     #layerButtons { display: inline-block; margin-left: 30px; }
-    
     /* Modal for Custom Pin Form */
     #pinFormModal {
       display: none;
@@ -228,7 +220,6 @@
     #pinFormModal label { font-weight: bold; }
     #pinFormModal input[type="text"],
     #pinFormModal textarea { width: 100%; margin-bottom: 10px; box-sizing: border-box; }
-    
     /* Icon Custom Options Layout */
     #iconCustomOptions {
       display: flex;
@@ -272,7 +263,6 @@
       justify-content: center;
     }
     .selected { border-color: orange !important; }
-    
     /* Enhanced Marker styling for map icons */
     .custom-marker {
       font-size: 10px;
@@ -286,7 +276,6 @@
       transform: scale(1.2);
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
-    
     /* Tooltip styling */
     .custom-tooltip {
       background: rgba(0,0,0,0.8);
@@ -295,7 +284,6 @@
       border-radius: 3px;
       font-size: 12px;
     }
-    
     /* Context Menu Styling */
     .custom-context-menu {
       text-align: center;
@@ -313,7 +301,6 @@
       background-color: #f9f9f9;
       color: #000;
     }
-    
     /* Toggle Button (bottom left) */
     #toggleAllUtovare {
       position: fixed;
@@ -321,7 +308,6 @@
       left: 10px;
       z-index: 10000;
     }
-    
     /* Responsive styles */
     @media (max-width: 768px) {
       #sidebarContainer { top: 5%; left: 5px; }
@@ -331,20 +317,20 @@
       #pinFormModal .modal-content { width: 95%; max-width: 280px; }
     }
   </style>
-  
-  <!-- Telematics API Libraries -->
+
+  <!-- Telemetics API Libraries (kept for legacy reasons) -->
   <script src="https://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
   <script src="https://app.nts-international.net/com/nts/js/nts-api.js"></script>
-  
+
   <!-- Leaflet & MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  
+
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-auth-compat.js"></script>
-  
+
   <!-- Override XMLHttpRequest to add required header for NTS API -->
   <script>
     (function() {
@@ -371,7 +357,7 @@
 <body>
   <!-- Notification Container -->
   <div id="notificationContainer"></div>
-  
+
   <!-- Authentication Overlay -->
   <div id="auth-container">
     <div id="signInContainer">
@@ -383,7 +369,7 @@
       </form>
     </div>
   </div>
-  
+
   <!-- Sidebar: Pin List -->
   <div id="sidebarContainer">
     <div id="pinListMenu">
@@ -391,16 +377,16 @@
       <div id="pinListResizer"></div>
     </div>
   </div>
-  
+
   <!-- Toggle Button -->
   <button id="toggleAllUtovare">Otvori sve utovare</button>
-  
+
   <!-- Search Container -->
   <div id="searchContainer">
     <input type="text" id="searchBar" placeholder="Pronađi lokaciju..." />
     <ul id="searchResults"></ul>
   </div>
-  
+
   <!-- Layer Selector -->
   <div id="layerSelectContainer">
     <select id="pinLayerSelect"></select>
@@ -411,13 +397,13 @@
       <button id="deleteLayerBtn">Obriši</button>
     </div>
   </div>
-  
+
   <!-- Map Container -->
   <div id="map"></div>
-  
+
   <!-- Hidden File Input for Import -->
   <input type="file" id="importLayerInput" style="display: none;" accept="application/json" />
-  
+
   <!-- Modal for Custom Pin Form -->
   <div id="pinFormModal">
     <div class="modal-content">
@@ -449,7 +435,7 @@
       <button id="cancelPinBtn">Otkaži</button>
     </div>
   </div>
-  
+
   <!-- Main JavaScript Code -->
   <script>
     // Global variable for the map (accessible by other functions)
@@ -560,6 +546,34 @@
       customPinLayer.addTo(map);
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
+      /***** NTSWeb Login *****/
+      // IMPORTANT: Logging into NTSWeb using provided credentials. 
+      // (Do not expose credentials in production!)
+      async function ntsWebLogin() {
+        try {
+          const formData = new URLSearchParams();
+          formData.append('username', 't0190-marko');
+          formData.append('password', 'airspeed1');
+          // Append additional parameters here if the login requires them (e.g., CSRF tokens)
+          const response = await fetch("https://app.nts-international.net/NTSWeb/authenticate", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
+          });
+          if (!response.ok) {
+            throw new Error("NTSWeb login failed with status: " + response.status);
+          }
+          console.log("NTSWeb login successful");
+          return await response.text();
+        } catch (error) {
+          console.error("Error during NTSWeb login:", error);
+          throw error;
+        }
+      }
+      
       /***** NTSWeb Integration via TCP Data *****/
       async function fetchTCPData() {
         try {
@@ -595,6 +609,13 @@
           }
         });
         console.log("Vehicle markers updated from TCP data.");
+      }
+      
+      // First log in to NTSWeb, then update vehicles
+      try {
+        await ntsWebLogin();
+      } catch (e) {
+        handleError(e, "NTSWeb Login");
       }
       
       // Initial call and periodic polling every 60 seconds
@@ -854,8 +875,8 @@
         const lighter = lightenColor(iconData.color, 20);
         const darker = darkenColor(iconData.color, 20);
         let inlineStyle = "background: " + iconData.color + "; background-image: linear-gradient(135deg, " 
-                        + lighter + ", " + darker + "); width:" + size + "px; height:" + size 
-                        + "px; line-height:" + size + "px; text-align:center;";
+                        + lighter + ", " + darker + "); width:" + size + "px; height:" + size + "px; line-height:" + size +
+                        "px; text-align:center;";
         if (iconData.shape === "circle") {
           inlineStyle += "border-radius:" + (size / 2) + "px;";
         }
