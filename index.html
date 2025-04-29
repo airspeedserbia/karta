@@ -332,10 +332,6 @@
     }
   </style>
   
-  <!-- Telematics API Libraries -->
-  <script src="https://app.nts-international.net/com/nts/js/nts-jwt.js"></script>
-  <script src="https://app.nts-international.net/com/nts/js/nts-api.js"></script>
-  
   <!-- Leaflet & MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
@@ -344,29 +340,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-auth-compat.js"></script>
-  
-  <!-- Override XMLHttpRequest to add required header for NTS API -->
-  <script>
-    (function() {
-      const originalOpen = XMLHttpRequest.prototype.open;
-      XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-        this.withCredentials = true;
-        this._ntsUrl = url;
-        return originalOpen.call(this, method, url, async, user, password);
-      };
-      const originalSend = XMLHttpRequest.prototype.send;
-      XMLHttpRequest.prototype.send = function(data) {
-        if (this._ntsUrl && this._ntsUrl.includes("app.nts-international.net")) {
-          try {
-            this.setRequestHeader("nts-application", "nts-rest-api");
-          } catch(e) {
-            console.error("Error setting nts-application header:", e);
-          }
-        }
-        return originalSend.call(this, data);
-      };
-    })();
-  </script>
 </head>
 <body>
   <!-- Notification Container -->
@@ -543,100 +516,104 @@
       }
     }
     
-    /************ Telematics Integration & Map Setup ************/
-    // Enhanced Telematics API login using async/await
-    async function performNTSLogin(ccodeAndApiUsername, password) {
-      const endpoint = "https://app.nts-international.net/NTSSecurity/login";
-      const basicAuth = "Basic " + btoa(ccodeAndApiUsername + ":" + password);
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': basicAuth,
-            'nts-application': 'nts-rest-api'
-          },
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error("Login failed with status " + response.status);
-        }
-        const data = await response.text();
-        console.log("Telematics API login successful!", data);
-        return data;
-      } catch (error) {
-        handleError(error, "Telematics API Login");
-        throw error;
-      }
-    }
-    
+    /************ Map Setup, Pin Management & NTSWeb Integration ************/
     async function initMapAndRealtime() {
       // Initialize the map and assign to global variable
       const map = L.map("map", { center: [45.541, 10.211], zoom: 7 });
-      globalMap = map;  // Make the map accessible globally
+      globalMap = map;
       const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "Map data © OpenStreetMap contributors"
       });
       baseLayer.addTo(map);
       
+      // Create vehicle layer & custom pin layer
       const vehicleLayer = L.markerClusterGroup();
       const customPinLayer = L.layerGroup();
       vehicleLayer.addTo(map);
       customPinLayer.addTo(map);
       L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
       
-      // Telematics API integration
-      const ccodeAndApiUsername = "t0190-api.marko";
-      const tsPassword = "marko2024";
-      try {
-        await performNTSLogin(ccodeAndApiUsername, tsPassword);
-        // After login, instantiate the NTS API object
-        window.api = new NTSApi("https://app.nts-international.net");
-        if (window.api && typeof window.api.allvehicles === "function") {
-          window.api.allvehicles = function(callback) {
-            fetch("https://app.nts-international.net/ntsapi/allvehicles?version=2", {
-              method: "POST",
-              credentials: "include",
-              headers: { "nts-application": "nts-rest-api" }
-            })
-            .then(res => {
-              if (!res.ok) throw new Error("HTTP error " + res.status);
-              return res.json();
-            })
-            .then(data => callback(data))
-            .catch(error => {
-              handleError(error, "Fetching All Vehicles");
-              callback(null);
-            });
-          };
-        }
-        // Function to fetch and update vehicle markers
-        function updateVehiclesFromTelematics() {
-          vehicleLayer.clearLayers();
-          console.log("Fetching all vehicles...");
-          api.allvehicles(function(vehicles) {
-            console.log("All vehicles response:", vehicles);
-            if (!vehicles || !Array.isArray(vehicles)) {
-              console.warn("No vehicles returned or response not an array.");
-              return;
-            }
-            vehicles.forEach(vehicle => {
-              api.vehiclestate(vehicle.id, "UTC", 2, false, false, function(state) {
-                if (state && state.gpsLat && state.gpsLon) {
-                  const marker = L.marker([state.gpsLat, state.gpsLon])
-                    .bindPopup("Vehicle ID: " + vehicle.id);
-                  vehicleLayer.addLayer(marker);
-                } else {
-                  console.warn("No valid GPS data for vehicle id:", vehicle.id);
-                }
-              });
-            });
+      /***** NTSWeb Telematics Integration *****/
+      // New functions for logging into NTSWeb and updating vehicle positions.
+      async function performNTSWebLogin(username, password) {
+        const loginUrl = "https://app.nts-international.net/NTSWeb/login";
+        try {
+          const response = await fetch(loginUrl, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username: username, password: password })
           });
+          if (!response.ok) {
+            throw new Error("NTSWeb login failed with status: " + response.status);
+          }
+          console.log("Successfully logged into NTSWeb");
+          return response;
+        } catch (error) {
+          throw new Error("NTSWeb login error: " + error.message);
         }
-        updateVehiclesFromTelematics();
-        setInterval(updateVehiclesFromTelematics, 60000);
-      } catch (error) {
-        console.error("Telematics integration has failed:", error);
       }
+      
+      async function loadNTSWebGeocodingService() {
+        const geocodeUrl = "https://app.nts-international.net/NTSWeb/script/NTSWebGeocodingService.js?v=1745916729750";
+        try {
+          const response = await fetch(geocodeUrl, {
+            method: "GET",
+            credentials: "include"
+          });
+          if (!response.ok) {
+            throw new Error("Failed to load geocoding service with status: " + response.status);
+          }
+          console.log("NTSWeb geocoding service loaded successfully");
+        } catch (error) {
+          console.warn("Geocoding service load warning:", error);
+        }
+      }
+      
+      async function updateVehiclesFromNTSWeb() {
+        const tcpDataUrl = "https://app.nts-international.net/NTSWeb/vehicle/getTCPData?q_server=.SERVER_98";
+        try {
+          const tcpResponse = await fetch(tcpDataUrl, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({})
+          });
+          if (!tcpResponse.ok) {
+            throw new Error("Failed to fetch TCP data: " + tcpResponse.status);
+          }
+          const vehicles = await tcpResponse.json();
+          console.log("Vehicles from NTSWeb:", vehicles);
+          
+          vehicleLayer.clearLayers();
+          vehicles.forEach(vehicle => {
+            if (vehicle.gpsLat && vehicle.gpsLon) {
+              const marker = L.marker([vehicle.gpsLat, vehicle.gpsLon])
+                .bindPopup("Vehicle ID: " + vehicle.id);
+              vehicleLayer.addLayer(marker);
+            } else {
+              console.warn("No valid GPS coordinates for vehicle id:", vehicle.id);
+            }
+          });
+        } catch (error) {
+          handleError(error, "NTSWeb Vehicle Update");
+        }
+      }
+      
+      (async function integrateNTSWeb() {
+        try {
+          await performNTSWebLogin("t0190-marko", "airspeed1");
+          loadNTSWebGeocodingService();
+          updateVehiclesFromNTSWeb();
+          setInterval(updateVehiclesFromNTSWeb, 60000);
+        } catch (error) {
+          console.error("NTSWeb integration error:", error);
+        }
+      })();
       
       /***** Firebase Realtime Database Integration & Custom Pin Management *****/
       let pinLayers = [];
@@ -644,7 +621,6 @@
       let activePinLayer = null;
       let customPins = [];
       
-      // Update pin list menu with click events to focus map on the marker
       function updatePinListMenu() {
         const content = document.getElementById("pinListContent");
         const sortedPins = customPins.slice().sort((a, b) => {
@@ -675,12 +651,10 @@
           }
           iconHtml += '">' + (pin.number || "") + '</div>';
           const textContent = '<span class="pin-text" style="' + textStyle + '">' + pin.title + (pin.description ? ' - ' + pin.description : '') + '</span>';
-          // Set data-pin-id so that clicking this item will move the map to the pin marker
           html += '<div class="pin-list-item" data-pin-id="' + pin.id + '">' + iconHtml + textContent + '</div>';
         });
         content.innerHTML = html;
         
-        // Attach click event on each pin list item so map centers on the pin marker at zoom level 9
         const items = content.querySelectorAll(".pin-list-item");
         items.forEach(item => {
           item.addEventListener("click", function() {
@@ -732,7 +706,6 @@
         customPinMarkers = {};
       }
       
-      /* Layer Selection UI */
       function updateLayerSelectMenu() {
         const select = document.getElementById("pinLayerSelect");
         select.innerHTML = "";
@@ -883,7 +856,6 @@
       }
       function getMarkerSize() {
         const baseSize = 20;
-        // Use the current globalMap zoom level
         const zoomDiff = globalMap.getZoom() - 13;
         const factor = 1.0366;
         return baseSize * Math.pow(factor, zoomDiff);
@@ -960,7 +932,6 @@
         updateTooltipPositions();
       });
       
-      /* Update Tooltip Positions (collision handling) */
       function updateTooltipPositions() {
         const visibleMarkers = [];
         for (const key in customPinMarkers) {
@@ -1314,7 +1285,6 @@
           searchResults.style.display = "none";
         }
       });
-      
     } // End initMapAndRealtime
   </script>
   
