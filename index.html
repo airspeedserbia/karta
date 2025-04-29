@@ -594,7 +594,7 @@
         if (window.api && typeof window.api.allvehicles === "function") {
           window.api.allvehicles = function(callback) {
             fetch("https://app.nts-international.net/ntsapi/allvehicles?version=2", {
-              method: "GET",
+              method: "POST",
               credentials: "include",
               headers: { "nts-application": "nts-rest-api" }
             })
