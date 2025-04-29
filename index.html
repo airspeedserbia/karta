@@ -536,7 +536,10 @@
       /***** NTSWeb Telematics Integration *****/
       // New functions for logging into NTSWeb and updating vehicle positions.
       async function performNTSWebLogin(username, password) {
-        const loginUrl = "https://app.nts-international.net/NTSWeb/login";
+        // IMPORTANT: The URL below is a placeholder.
+        // The error you saw (404) indicates that the endpoint /NTSWeb/login may be wrong.
+        // Replace the URL below with the correct login endpoint for NTSWeb.
+        const loginUrl = "https://app.nts-international.net/NTSWeb/api/login";
         try {
           const response = await fetch(loginUrl, {
             method: "POST",
