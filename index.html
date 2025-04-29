@@ -171,6 +171,11 @@
       border-radius: 4px;
       box-sizing: border-box;
       transition: box-shadow 0.3s ease;
+      background-color: white !important;
+      opacity: 1 !important;
+      border: 1px solid #ccc !important;
+}
+
     }
     #searchBar:focus {
       outline: none;
@@ -201,7 +206,13 @@
       transform: translateX(-50%);
       z-index: 10001;
     }
-    #layerSelectContainer select { padding: 5px; font-size: 14px; }
+    #layerSelectContainer select { 
+      padding: 5px; font-size: 14px; 
+      background-color: white !important;
+      opacity: 1 !important;
+      border: 1px solid #ccc !important;
+
+    }
     #layerButtons { display: inline-block; margin-left: 30px; }
     
     /* Modal for Custom Pin Form */
@@ -218,12 +229,14 @@
       justify-content: center;
     }
     #pinFormModal .modal-content {
+      width: 80% !important; /* Reduce width */
+      max-width: 280px !important; /* Set a smaller max-width */
+      padding: 15px !important; /* Reduce padding */
       background: #fff;
       padding: 20px;
       border-radius: 12px;
       width: 90%;
       max-width: 320px;
-      max-height: 500px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.4);
     }
     #pinFormModal label { font-weight: bold; }
