@@ -177,6 +177,7 @@
 
 /* Styling for the search bar input */
 #searchBar {
+  background: white !important;
   width: 100%; /* Full width of the container */
   padding: 8px; /* Padding inside the input */
   font-size: 16px; /* Font size */
@@ -188,6 +189,7 @@
 
 /* Focus state for the search bar */
 #searchBar:focus {
+  background: white !important;
   outline: none; /* Remove default outline */
   box-shadow: 0 0 5px rgba(81, 203, 238, 1); /* Blue glow effect */
   border-color: rgba(81, 203, 238, 1); /* Blue border */
@@ -227,6 +229,11 @@
 }
 /* Styling for the layer selection dropdown */
 #layerSelectContainer select {
+  background: white !important;
+  padding: 5px; /* Padding inside the dropdown */
+  font-size: 14px; /* Font size for the dropdown text */
+}#layerSelectContainer select:focus {
+  background: white !important;
   padding: 5px; /* Padding inside the dropdown */
   font-size: 14px; /* Font size for the dropdown text */
 }
@@ -632,134 +639,167 @@
   // Global variable for file saving (File System Access API)
   let saveFolderHandle = null;
   async function saveFile(data, fileName) {
-    if (!window.showDirectoryPicker) {
-      alert("File System Access API is not supported in this browser.");
-      return;
-    }
-    if (!saveFolderHandle) { 
-      saveFolderHandle = await window.showDirectoryPicker(); 
-    }
-    try {
-      const kartaHandle = await saveFolderHandle.getDirectoryHandle("Karta", { create: true });
-      const fileHandle = await kartaHandle.getFileHandle(fileName, { create: true });
-      const writableStream = await fileHandle.createWritable();
-      await writableStream.write(data);
-      await writableStream.close();
-      alert("File saved successfully to Documents/Karta as " + fileName);
-    } catch (error) {
-      handleError(error, "Save File");
-    }
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    alert("File saved successfully as " + fileName);
   }
 
 /************ Telematics Integration & Map Setup ************/
 
-// Function to perform login to the Telematics API using async/await
-async function performNTSLogin(ccodeAndApiUsername, password) {
+// Function to fetch all vehicles and their states, then display them on the map
+async function fetchAndDisplayVehicles() {
+  try {
+    // Step 1: Fetch all vehicles with their IDs and license plates
+    const allVehiclesResponse = await fetch("https://app.nts-international.net/ntsapi/allvehicles", {
+      method: "GET",
+      credentials: "include", // Include the HTTPOnly auth-token
+      headers: { "nts-application": "nts-rest-api" }
+    });
+
+    if (!allVehiclesResponse.ok) {
+      throw new Error("Failed to fetch all vehicles: " + allVehiclesResponse.status);
+    }
+
+    const allVehiclesData = await allVehiclesResponse.json();
+    console.log("All Vehicles Data:", allVehiclesData); // Debug the response
+
+    const vehicleMap = {}; // Map to tie vehicle IDs to license plates
+    allVehiclesData.forEach(vehicle => {
+      vehicleMap[vehicle.id] = vehicle.licenceplate; // Map ID to license plate
+    });
+
+    // Step 2: Fetch all vehicle states
+    const allVehicleStatesResponse = await fetch("https://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true&version=2.3", {
+      method: "GET",
+      credentials: "include", // Include the HTTPOnly auth-token
+      headers: { "nts-application": "nts-rest-api" }
+    });
+
+    if (!allVehicleStatesResponse.ok) {
+      throw new Error("Failed to fetch all vehicle states: " + allVehicleStatesResponse.status);
+    }
+
+    const allVehicleStatesData = await allVehicleStatesResponse.json();
+    console.log("All Vehicle States Data:", allVehicleStatesData); // Debug the response
+
+    // Step 3: Clear existing markers and display new ones
+    vehicleLayer.clearLayers(); // Clear existing vehicle markers
+
+    allVehicleStatesData.forEach(state => {
+      const vehicleId = state.vehicleId; // Match vehicleId from allvehiclestate
+      const licensePlate = vehicleMap[vehicleId]; // Get license plate from the map
+
+      if (state.gpsLat && state.gpsLon && licensePlate) {
+        // Create a custom marker design
+        const markerHtml = `
+          <div style="
+            position: relative;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          ">
+            ${licensePlate}
+            <div style="
+              position: absolute;
+              bottom: -15px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 2px;
+              height: 15px;
+              background: #000;
+            "></div>
+          </div>
+        `;
+
+        // Create a custom divIcon
+        const customIcon = L.divIcon({
+          html: markerHtml,
+          className: "custom-vehicle-marker",
+          iconSize: [100, 40], // Adjust size as needed
+          iconAnchor: [50, 40] // Anchor at the bottom center
+        });
+
+        // Add the marker to the map
+        const marker = L.marker([state.gpsLat, state.gpsLon], { icon: customIcon });
+        vehicleLayer.addLayer(marker); // Add marker to the vehicle layer
+      } else {
+        console.warn(`Missing GPS data or license plate for VehicleId: ${vehicleId}`);
+      }
+    });
+
+    console.log("Vehicle markers updated successfully.");
+  } catch (error) {
+    console.error("Error fetching and displaying vehicles:", error);
+  }
+}
+
+// Function to perform login to the Telematics API
+async function performLogin() {
   const endpoint = "https://app.nts-international.net/NTSSecurity/login";
-  const basicAuth = "Basic " + btoa(ccodeAndApiUsername + ":" + password); // Encode credentials in Base64
+  const basicAuth = "Basic " + btoa("t0190-api.marko:marko2024"); // Base64-encoded username:password
+
   try {
     const response = await fetch(endpoint, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': basicAuth, // Add Basic Auth header
-        'nts-application': 'nts-rest-api' // Custom header for the API
+        "Authorization": basicAuth,
+        "nts-application": "nts-rest-api"
       },
-      credentials: 'include' // Include cookies in the request
+      credentials: "include" // Include cookies in the request
     });
+
     if (!response.ok) {
-      throw new Error("Login failed with status " + response.status); // Handle login failure
+      throw new Error("Login failed: " + response.status);
     }
-    const data = await response.text(); // Parse response as text
-    console.log("Telematics API login successful!", data);
-    return data;
+
+    console.log("Login successful!");
   } catch (error) {
-    handleError(error, "Telematics API Login"); // Handle errors
+    console.error("Error during login:", error);
     throw error;
   }
 }
 
-// Function to initialize the map and integrate real-time updates
+// Initialize the map and integrate real-time updates
+let vehicleLayer; // Declare globally
+
 async function initMapAndRealtime() {
-  // Initialize the map and set its center and zoom level
   const map = L.map("map", { center: [45.541, 10.211], zoom: 7 });
   globalMap = map; // Make the map globally accessible
 
-  // Add a base layer to the map using OpenStreetMap tiles
   const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "Map data © OpenStreetMap contributors"
   });
   baseLayer.addTo(map);
 
-  // Create layers for vehicles and custom pins
-  const vehicleLayer = L.markerClusterGroup(); // Clustered layer for vehicles
+  vehicleLayer = L.markerClusterGroup(); // Initialize the vehicle layer
+  vehicleLayer.addTo(map); // Add the vehicle layer to the map
+
   const customPinLayer = L.layerGroup(); // Layer for custom pins
-  vehicleLayer.addTo(map);
   customPinLayer.addTo(map);
 
-  // Add layer controls to toggle visibility of layers
-  L.control.layers({ "Base Map": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
+  L.control.layers({ "Base Map": baseLayer }, { "Vehicles": vehicleLayer, "Custom Pins": customPinLayer }).addTo(map);
 
-  // Telematics API integration
-  const ccodeAndApiUsername = "t0190-api.marko"; // API username
-  const tsPassword = "marko2024"; // API password
   try {
-    await performNTSLogin(ccodeAndApiUsername, tsPassword); // Perform login
-
-    // Instantiate the NTS API object after successful login
-    window.api = new NTSApi("https://app.nts-international.net");
-
-    // Override the `allvehicles` method to fetch vehicle data
-    if (window.api && typeof window.api.allvehicles === "function") {
-      window.api.allvehicles = function(callback) {
-        fetch("https://app.nts-international.net/ntsapi/allvehicles?version=2", {
-          method: "GET",
-          credentials: "include",
-          headers: { "nts-application": "nts-rest-api" }
-        })
-        .then(res => {
-          if (!res.ok) throw new Error("HTTP error " + res.status); // Handle HTTP errors
-          return res.json(); // Parse response as JSON
-        })
-        .then(data => callback(data)) // Pass data to the callback
-        .catch(error => {
-          handleError(error, "Fetching All Vehicles"); // Handle errors
-          callback(null);
-        });
-      };
-    }
-
-    // Function to fetch and update vehicle markers on the map
-    function updateVehiclesFromTelematics() {
-      vehicleLayer.clearLayers(); // Clear existing markers
-      console.log("Fetching all vehicles...");
-      api.allvehicles(function(vehicles) {
-        console.log("All vehicles response:", vehicles);
-        if (!vehicles || !Array.isArray(vehicles)) {
-          console.warn("No vehicles returned or response not an array.");
-          return;
-        }
-        // Add markers for each vehicle with valid GPS data
-        vehicles.forEach(vehicle => {
-          api.vehiclestate(vehicle.id, "UTC", 2, false, false, function(state) {
-            if (state && state.gpsLat && state.gpsLon) {
-              const marker = L.marker([state.gpsLat, state.gpsLon])
-                .bindPopup("Vehicle ID: " + vehicle.id); // Add popup with vehicle ID
-              vehicleLayer.addLayer(marker); // Add marker to the vehicle layer
-            } else {
-              console.warn("No valid GPS data for vehicle id:", vehicle.id);
-            }
-          });
-        });
-      });
-    }
-
-    // Fetch vehicle data immediately and then every 60 seconds
-    updateVehiclesFromTelematics();
-    setInterval(updateVehiclesFromTelematics, 60000);
-
+    await performLogin(); // Perform login
+    fetchAndDisplayVehicles(); // Fetch and display vehicles
+    setInterval(fetchAndDisplayVehicles, 60000); // Refresh every 60 seconds
   } catch (error) {
-    console.error("Telematics integration has failed:", error); // Log errors
+    console.error("Telematics integration has failed:", error);
   }
+
 
   /***** Firebase Realtime Database Integration & Custom Pin Management *****/
   let pinLayers = []; // Array to store pin layers
