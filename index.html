@@ -575,46 +575,47 @@
     
     // Global variable for file saving (File System Access API)
     let saveFolderHandle = null;
-    async function saveFile(data, fileName) {
-      if (!window.showDirectoryPicker) {
-        alert("File System Access API is not supported in this browser.");
-        return;
-      }
-      if (!saveFolderHandle) { 
-        saveFolderHandle = await window.showDirectoryPicker(); 
-      }
-      try {
-let saveFolderHandle = null;
 async function saveFile(data, fileName) {
   if (!window.showDirectoryPicker) {
     alert("File System Access API is not supported in this browser.");
     return;
   }
-  if (!saveFolderHandle) { 
+  if (!saveFolderHandle) {
     saveFolderHandle = await window.showDirectoryPicker();
   }
+  
+  // Declare 'fileHandle' in the outer scope
+  let fileHandle;
+  
   try {
-    let fileHandle;
     try {
       // Try to get an existing file without creating a new one.
       fileHandle = await saveFolderHandle.getFileHandle(fileName, { create: false });
-      // If the file exists, prompt the user about overwriting.
+      // Ask the user whether to overwrite the file
       const overwrite = confirm(`File "${fileName}" already exists. Do you want to overwrite it?`);
       if (!overwrite) {
-        // If the user doesn't want to overwrite, let them enter a new name.
         const newFileName = prompt("Enter a new filename:", fileName);
-        if (!newFileName) return; // Cancel saving if no new name is provided.
+        if (!newFileName) return; // Cancel if no new filename is provided.
         fileName = newFileName;
         fileHandle = await saveFolderHandle.getFileHandle(fileName, { create: true });
       } else {
-        // If overwriting, open the file with the create flag (which replaces the file).
+        // Overwrite existing file
         fileHandle = await saveFolderHandle.getFileHandle(fileName, { create: true });
       }
-    } catch (error) {
-      // If getFileHandle throws, assume the file doesn’t exist and create it.
+    } catch (innerError) {
+      // If the file doesn't exist, create it.
       fileHandle = await saveFolderHandle.getFileHandle(fileName, { create: true });
     }
-    
+
+    // Use the file handle to write the data.
+    const writableStream = await fileHandle.createWritable();
+    await writableStream.write(data);
+    await writableStream.close();
+    alert("File saved successfully as " + fileName);
+  } catch (error) {
+    handleError(error, "Save File");
+  }
+}  
     const writableStream = await fileHandle.createWritable();
     await writableStream.write(data);
     await writableStream.close();
