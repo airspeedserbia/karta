@@ -1125,7 +1125,7 @@
         const pin = customPins.find(item => item.id === pinId);
         if (pin) {
           currentEditingPinId = pinId;
-          document.getElementById("modalHeader").textContent = "Edit Custom Pin";
+          document.getElementById("modalHeader").textContent = "";
           document.getElementById("pinTitle").value = pin.title;
           document.getElementById("pinNumber").value = pin.number;
           document.getElementById("pinDescription").value = pin.description;
