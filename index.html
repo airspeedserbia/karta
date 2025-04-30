@@ -645,7 +645,7 @@
         window.api = new NTSApi("https://app.nts-international.net");
         if (window.api && typeof window.api.allvehicles === "function") {
           window.api.allvehicles = function(callback) {
-            fetch("http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true&version=2.3", {
+            fetch("https://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true&version=2.3", {
               method: "GET",
               credentials: "include",
               headers: { "nts-application": "nts-rest-api" }
