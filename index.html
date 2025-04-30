@@ -626,7 +626,7 @@
         saveFolderHandle = await window.showDirectoryPicker(); 
       }
       try {
-        const kartaHandle = await saveFolderHandle.getDirectoryHandle("Karta"; { create: true });
+        const kartaHandle = await saveFolderHandle.getDirectoryHandle("Karta", { create: true });
         const fileHandle = await kartaHandle.getFileHandle(fileName, { create: true });
         const writableStream = await fileHandle.createWritable();
         await writableStream.write(data);
