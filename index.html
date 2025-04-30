@@ -615,27 +615,27 @@
       };
     }
     
-    // Global variable for file saving (File System Access API)
-    let saveFolderHandle = null;
-    async function saveFile(data, fileName) {
-      if (!window.showDirectoryPicker) {
-        alert("File System Access API is not supported in this browser.");
-        return;
-      }
-      if (!saveFolderHandle) { 
-        saveFolderHandle = await window.showDirectoryPicker(); 
-      }
-      try {
-        const kartaHandle = await saveFolderHandle.getDirectoryHandle("Karta", { create: true });
-        const fileHandle = await kartaHandle.getFileHandle(fileName, { create: true });
-        const writableStream = await fileHandle.createWritable();
-        await writableStream.write(data);
-        await writableStream.close();
-        alert("File saved successfully to Documents/Karta as " + fileName);
-      } catch (error) {
-        handleError(error, "Save File");
-      }
-    }
+// Global variable for file saving (File System Access API)
+let saveFolderHandle = null;
+async function saveFile(data, fileName) {
+  if (!window.showDirectoryPicker) {
+    alert("File System Access API is not supported in this browser.");
+    return;
+  }
+  if (!saveFolderHandle) { 
+    saveFolderHandle = await window.showDirectoryPicker(); 
+  }
+  try {
+    // Directly get the file handle from the selected folder
+    const fileHandle = await saveFolderHandle.getFileHandle(fileName, { create: true });
+    const writableStream = await fileHandle.createWritable();
+    await writableStream.write(data);
+    await writableStream.close();
+    alert("File saved successfully as " + fileName);
+  } catch (error) {
+    handleError(error, "Save File");
+  }
+}
     
     /************ Telematics Integration & Map Setup ************/
     // Enhanced Telematics API login using async/await
