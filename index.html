@@ -811,7 +811,7 @@ async function fetchAndDisplayVehicles() {
   try {
     // Step 1: Fetch all vehicles with their IDs and license plates
     const allVehiclesResponse = await fetch("https://app.nts-international.net/ntsapi/allvehicles", {
-      method: "GET",
+      method: "POST",
       credentials: "include", // Include the HTTPOnly auth-token
       headers: { "nts-application": "nts-rest-api" }
     });
@@ -830,7 +830,7 @@ async function fetchAndDisplayVehicles() {
 
     // Step 2: Fetch all vehicle states
     const allVehicleStatesResponse = await fetch("https://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true&version=2.3", {
-      method: "GET",
+      method: "POST",
       credentials: "include", // Include the HTTPOnly auth-token
       headers: { "nts-application": "nts-rest-api" }
     });
