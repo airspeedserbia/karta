@@ -14,7 +14,7 @@
   <style>
     /* Global Button styling for consistent appearance */
     button {
-      background-color: #4caf50; /* Green background@ */
+      background-color: #4caf50; /* Green background */
       border: none; /* Remove border */
       color: white; /* White text */
       padding: 10px 20px; /* Padding inside the button */
@@ -436,162 +436,95 @@
   z-index: 10000; /* High z-index to appear above other elements */
 }
 
-/* Responsive styles for smaller screens */
-@media (max-width: 768px) {
+/* Responsive styles for iPhone 11 and iPhone 13 (844px width) */
+@media (max-width: 845px) {
+  /* Hide all buttons */
+  #renameLayerBtn, /* Preimenuj */
+  #exportLayerBtn, /* Sačuvaj */
+  #importLayerBtn, /* Dodaj */
+  #deleteLayerBtn, /* Obriši */
+  #toggleAllUtovare { /* Otvori sve utovare */
+    display: none !important;
+  }
+
+  #sidebarContainer {
+    display: none !important; /* Hide the pin list menu on smaller screens */
+  }
+
+  /* Move the search bar to the bottom */
   #searchContainer {
-    position: fixed;
-    top: 10px; /* Align at the top */
-    left: 10px; /* Add some margin from the left */
-    width: calc(50% - 15px); /* Take half the width minus spacing */
-    max-width: none; /* Remove max-width restriction */
-    z-index: 10001;
+    position: fixed !important; /* Fix the search bar at the bottom */
+    top: 45px !important; /* 40px from the top */
+    left: 50% !important; /* Center horizontally */
+    transform: translateX(-50%) !important; /* Adjust for centering */
+    width: 200px !important; /* Fixed width of 200px */
+    max-width: 350px !important; /* Maximum width of 350px */
+    z-index: 10001 !important; /* High z-index to appear above other elements */
+    pointer-events: auto !important; /* Allow interaction with the search bar */
   }
 
-  #layerSelectContainer {
-    position: fixed;
-    top: 10px; /* Align at the top */
-    right: 10px; /* Add some margin from the right */
-    width: calc(50% - 15px); /* Take half the width minus spacing */
-    max-width: none; /* Remove max-width restriction */
-    z-index: 10001;
+  #layerselectcontainer {
+    position: fixed !important; /* Fix the layer selector at the bottom */
+    top: 10px !important; /* 40px from the top */
+    left: 50% !important; /* Center horizontally */
+    transform: translateX(-50%) !important; /* Adjust for centering */
+    width: 200px !important; /* Fixed width of 200px */
+    max-width: 350px !important; /* Maximum width of 350px */
+    height: 40px !important;
+    z-index: 10001 !important; /* High z-index to appear above other elements */
+    pointer-events: auto !important; /* Allow interaction with the layer selector */
   }
 
+  /* Hide shape and color selection sections */
+  #shapeSelection,
+  #colorSelection,
+  #iconPreview {
+    display: none !important; /* Hide these sections */
+  }
+
+  /* Adjust the layout of the pin form modal */
   #pinFormModal .modal-content {
-    width: 95%; /* Adjust the width of the modal content */
-    max-width: 280px; /* Set a maximum width for the modal content */
-    max-height: 90%; /* Ensure it fits within the screen */
+    width: 95%; /* Take up most of the screen width */
+    max-width: 300px; /* Set a maximum width */
+    padding: 2px; /* Reduce padding */
+    max-height: 60%; /* Limit the height to 60% of the screen */
     overflow-y: auto; /* Add scrolling for overflow content */
+  }
+
+  /* Reduce spacing between input fields and labels */
+  #pinFormModal label {
+    margin-bottom: 1px; /* Reduce space below labels */
+    font-size: 14px; /* Slightly smaller font size */
   }
 
   #pinFormModal input[type="text"],
   #pinFormModal textarea {
-    font-size: 14px; /* Adjust font size for smaller screens */
+    margin: 1px 0; /* Reduce vertical spacing between inputs */
+    padding: 2px; /* Adjust padding inside inputs */
+    font-size: 14px; /* Slightly smaller font size */
   }
 
-  #iconCustomOptions {
-    flex-direction: column; /* Stack options vertically */
-    align-items: center; /* Center align the options */
+  /* Adjust the height of the pin description textarea */
+  #pinFormModal textarea#pinDescription {
+    height: auto; /* Set a shorter height */
+    resize: none; /* Disable resizing for consistent appearance */
   }
 
+  /* Adjust button layout */
+  #savePinBtn,
+  #cancelPinBtn {
+    margin-top: 1px; /* Reduce spacing above the buttons */
+    padding: 2px; /* Adjust padding inside buttons */
+    font-size: 14px; /* Slightly smaller font size */
+    width: 100%; /* Make buttons full width */
+  }
+
+  /* Hide icon preview, shape, and color selection */
+  #iconPreview,
   #shapeSelection,
   #colorSelection {
-    padding: 5px 0; /* Add vertical padding */
-    border-right: none; /* Remove the divider line */
+    display: none !important; /* Hide these sections */
   }
-
-  #iconPreview {
-    margin-top: 10px; /* Add spacing above the preview */
-  }
-
-  #sidebarContainer {
-    display: none !important; /* Hide the sidebar on smaller screens */
-  }
-
-  #pinListMenu {
-    display: none !important; /* Hide the pin list menu on smaller screens */
-  }
-
-  #searchContainer {
-    position: fixed !important; /* Fix the search bar at the top */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust for centering */
-    width: 50%; /* Take up 90% of the width */
-    max-width: 350px; /* Maximum width of 375px */
-    max-height: 40px; /* Maximum height of 40px */
-    z-index: 10001; /* High z-index to appear above other elements */
-    pointer-events: auto; /* Allow interaction with the search bar */
-  }
-
-  #layerSelectContainer {
-    position: fixed !important; /* Fix the layer selector at the bottom */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust for centering */
-    width: 50%; /* Take up 90% of the width */
-    max-width: 350px; /* Maximum width of 375px */
-    height: 40px;
-    z-index: 10001; /* High z-index to appear above other elements */
-    pointer-events: auto; /* Allow interaction with the layer selector */
-  }
-  #pinlayerSelect {
-    width: 100%; /* Full width of the container */
-    padding: 5px; /* Padding inside the dropdown */
-    font-size: 14px; /* Font size for the dropdown text */
-  }
-
-  #pinFormModal .modal-content {
-    width: 95%; /* Adjust the width of the modal content */
-    max-width: 280px; /* Set a maximum width for the modal content */
-  }
-
-  #layerButtons, #renameLayerBtn, #exportLayerBtn, #importLayerBtn, #deleteLayerBtn, #toggleAllUtovare {
-    display: none; /* Hide buttons on smaller screens */
-  }
-}
-
-/* Responsive styles for phone screens (320px to 375px) */
-@media (max-width: 390px) {
-  #searchContainer{
-    position: static; /* Static position for better layout on small screens */
-    bottom: 10px !important; /* Align at the top */
-    width: 48% !important; /* Each takes 48% of the width */
-    height: 40px !important; /* Consistent height */
-    pointer-events: auto !important; /* Allow interaction with the search bar */
-  }
-  #layerSelectContainer {
-    position: static; /* Static position for better layout on small screens */
-    top: 10px !important; /* Align at the top */
-    width: 48% !important; /* Each takes 48% of the width */
-    height: 40px !important; /* Consistent height */
-    pointer-events: auto !important; /* Allow interaction with the search bar */
-  }
-
-  #searchContainer {
-    left: 5px !important; /* Move 5px to the left (adjusted for margin) */
-    margin-right: 2% !important; /* Add a small gap between the two elements */
-    z-index: 10001 !important; /* High z-index to appear above other elements */
-  }
-
-  #layerSelectContainer {
-    right: 5px !important; /* Move 5px to the right (adjusted for margin) */
-  }
-
-  /* Adjust the search bar input */
-  #searchBar {
-    width: 100% !important; /* Full width of the container */
-    height: 100% !important; /* Match the container height */
-    padding: 5px !important; /* Padding inside the input */
-    font-size: 14px !important; /* Font size */
-    box-sizing: border-box !important; /* Include padding in width calculation */
-  }
-
-  /* Adjust the layer selector dropdown */
-  #pinLayerSelect {
-    width: 100% !important; /* Full width of the container */
-    height: 100% !important; /* Match the container height */
-    padding: 5px !important; /* Padding inside the dropdown */
-    font-size: 14px !important; /* Font size for the dropdown text */
-    box-sizing: border-box !important; /* Include padding in width calculation */
-  }
-
-  /* Map container adjustments */
-  #map {
-    height: calc(100vh - 60px) !important; /* Adjust height to account for search bar and layer selector */
-    margin-top: 60px !important; /* Add margin to avoid overlap with fixed elements */
-  }
-}
-
-/* Ensure the map is fully interactive on mobile */
-#map {
-  touch-action: none; /* Allow touch gestures like pinch-to-zoom */
-}
-
-/* Prevent other elements from interfering with touch events */
-body, html {
-  -webkit-touch-callout: none; /* Disable callout on long press */
-  -webkit-user-select: none; /* Disable text selection */
-  user-select: none; /* Standard property for compatibility */
-  -ms-touch-action: none; /* Disable default touch actions */
-  touch-action: manipulation; /* Allow touch gestures */
 }
 </style>
 
@@ -857,32 +790,38 @@ async function fetchAndDisplayVehicles() {
       const licensePlate = vehicleMap[vehicleId]; // Get license plate from the map
 
       if (state.gpsLat && state.gpsLon && licensePlate) {
+        // Determine the color based on ignitionStatus
+        const plateColor = state.ignitionStatus ? "green" : "red";
+
         // Create a custom marker design
-        const markerHtml = `
-          <div style="
-            position: relative;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-            color: #000;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 5px 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-          ">
-            ${licensePlate}
-            <div style="
-              position: absolute;
-              bottom: -15px;
-              left: 50%;
-              transform: translateX(-50%);
-              width: 2px;
-              height: 15px;
-              background: #000;
-            "></div>
-          </div>
-        `;
+const zoomLevel = globalMap.getZoom();
+const lineHeight = Math.max(0, 15 - (zoomLevel - 10) - 10); // Calculate line height dynamically
+
+const markerHtml = `
+  <div style="
+    position: relative;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: ${plateColor}; /* Dynamic color based on ignitionStatus */
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  ">
+    ${licensePlate}
+    <div style="
+      position: absolute;
+      bottom: -${lineHeight}px; /* Adjust bottom dynamically */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: ${lineHeight}px; /* Adjust height dynamically */
+      background: #000;
+    "></div>
+  </div>
+`;
 
         // Create a custom divIcon
         const customIcon = L.divIcon({
@@ -1581,6 +1520,14 @@ function showPinForm() {
   document.getElementById("pinTitle").value = "";
   document.getElementById("pinNumber").value = "";
   document.getElementById("pinDescription").value = "";
+
+  // Enforce default icon choices for smaller screens
+  const screenWidth = window.innerWidth;
+  if (screenWidth <= 845) {
+    selectedShape = "square"; // Default to square
+    selectedColor = "black"; // Default to black
+  }
+
   updateSelectedIconChoices("circle", "blue"); // Default icon choices
   const tableHTML = generateColorTable();
   document.getElementById("colorSelection").innerHTML = tableHTML;
