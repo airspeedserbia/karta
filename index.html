@@ -39,9 +39,10 @@
     #map {
       height: 100vh; /* Full viewport height for the map */
       width: 100%; /* Full width for the map */
+      z-index: 1; /* Ensure the map is below other elements */
+      pointer-events: auto; /* Ensure the map remains interactive */
     }
     .leaflet-div-icon {
-      background: transparent !important; /* Transparent background for custom icons */
       border: none !important; /* Remove border */
       box-shadow: none !important; /* Remove shadow */
     }
@@ -150,9 +151,9 @@
   color: white; /* White text color */
   border: 2px solid rgba(255, 255, 255, 0.8); /* White border with slight transparency */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
-  line-height: 15px; /* Center text vertically */
-  width: 15px; /* Fixed width */
-  height: 15px; /* Fixed height */
+  line-height: 14px; /* Center text vertically */
+  width: 18px; /* Fixed width */
+  height: 18px; /* Fixed height */
   text-align: center; /* Center text horizontally */
   transition: transform 0.2s ease; /* Smooth scaling transition */
 }
@@ -170,9 +171,11 @@
   position: absolute; /* Positioned relative to the map */
   top: 10px; /* 10px from the top */
   left: 50px; /* 50px from the left */
-  z-index: 10001; /* High z-index to appear above other elements */
+  z-index: 10001; /* Ensure it is above the map but below other critical elements */
   width: 80%; /* Take up 80% of the width */
   max-width: 375px; /* Maximum width of 375px */
+  pointer-events: auto; /* Allow interaction with the search bar */
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
 }
 
 /* Styling for the search bar input */
@@ -264,22 +267,29 @@
   background: #fff; /* White background */
   padding: 20px; /* Padding inside the modal */
   border-radius: 12px; /* Rounded corners */
-  width: 90%; /* Take up 90% of the screen width */
-  max-width: 320px; /* Maximum width of 320px */
+  width: 95%; /* Take up 95% of the screen width */
+  max-width: 370px; /* Set the maximum width to 370px */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
 }
 
-/* Bold labels inside the modal */
+/* Adjust margins and spacing in the pin form modal */
 #pinFormModal label {
-  font-weight: bold; /* Bold text for labels */
+  margin-bottom: 5px; /* Reduce space below labels */
+  display: block; /* Ensure labels are block elements */
 }
 
-/* Styling for text inputs and textareas inside the modal */
 #pinFormModal input[type="text"],
 #pinFormModal textarea {
+  margin: 5px 0; /* Reduce vertical spacing between inputs and textareas */
+  padding: 6px; /* Adjust padding inside inputs and textareas */
   width: 100%; /* Full width */
-  margin-bottom: 10px; /* Space below each input */
   box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Adjust the height of the pin description textarea */
+#pinFormModal textarea#pinDescription {
+  height: 60px; /* Set a shorter height */
+  resize: none; /* Disable resizing for consistent appearance */
 }
 
 /* Layout for custom icon options */
@@ -318,10 +328,19 @@
   border-collapse: collapse; /* Remove gaps between table cells */
 }
 
+/* Ensure perfect fit for color-option in table cells */
+#colorSelection td {
+  padding: 0 !important; /* Remove padding */
+  margin: 0 !important; /* Remove margin */
+  width: 15px; /* Match the width of .color-option */
+  height: 15px; /* Match the height of .color-option */
+  box-sizing: border-box; /* Ensure consistent sizing */
+}
+
 /* Styling for individual table cells */
 #colorSelection td {
-  padding: 0; /* Remove padding */
-  margin: 0; /* Remove margin */
+  padding: 0 !important; /* Remove padding */
+  margin: 0 !important; /* Remove margin */
 }
 
 /* Styling for individual color options */
@@ -331,6 +350,15 @@
   cursor: pointer; /* Pointer cursor to indicate interactivity */
   border: 1px solid #ccc; /* Light gray border */
   display: inline-block; /* Inline-block layout */
+}
+
+/* Styling for individual color options */
+.color-option {
+  width: 15px; /* Fixed width */
+  height: 15px; /* Fixed height */
+  display: block; /* Ensure it fills the cell */
+  margin: 0; /* Remove any margin */
+  cursor: pointer; /* Pointer cursor for interactivity */
 }
 
 /* Styling for the icon preview section */
@@ -410,23 +438,84 @@
 
 /* Responsive styles for smaller screens */
 @media (max-width: 768px) {
-  #sidebarContainer {
-    top: 5%; /* Adjust the top position of the sidebar */
-    left: 5px; /* Adjust the left position of the sidebar */
-  }
-
-  #pinListMenu {
-    width: 180px; /* Reduce the width of the pin list menu */
-    height: 250px; /* Reduce the height of the pin list menu */
-  }
-
   #searchContainer {
-    left: 10%; /* Adjust the left position of the search container */
-    width: 90%; /* Adjust the width of the search container */
+    position: fixed;
+    top: 10px; /* Align at the top */
+    left: 10px; /* Add some margin from the left */
+    width: calc(50% - 15px); /* Take half the width minus spacing */
+    max-width: none; /* Remove max-width restriction */
+    z-index: 10001;
   }
 
   #layerSelectContainer {
-    top: 5px; /* Adjust the top position of the layer selector */
+    position: fixed;
+    top: 10px; /* Align at the top */
+    right: 10px; /* Add some margin from the right */
+    width: calc(50% - 15px); /* Take half the width minus spacing */
+    max-width: none; /* Remove max-width restriction */
+    z-index: 10001;
+  }
+
+  #pinFormModal .modal-content {
+    width: 95%; /* Adjust the width of the modal content */
+    max-width: 280px; /* Set a maximum width for the modal content */
+    max-height: 90%; /* Ensure it fits within the screen */
+    overflow-y: auto; /* Add scrolling for overflow content */
+  }
+
+  #pinFormModal input[type="text"],
+  #pinFormModal textarea {
+    font-size: 14px; /* Adjust font size for smaller screens */
+  }
+
+  #iconCustomOptions {
+    flex-direction: column; /* Stack options vertically */
+    align-items: center; /* Center align the options */
+  }
+
+  #shapeSelection,
+  #colorSelection {
+    padding: 5px 0; /* Add vertical padding */
+    border-right: none; /* Remove the divider line */
+  }
+
+  #iconPreview {
+    margin-top: 10px; /* Add spacing above the preview */
+  }
+
+  #sidebarContainer {
+    display: none !important; /* Hide the sidebar on smaller screens */
+  }
+
+  #pinListMenu {
+    display: none !important; /* Hide the pin list menu on smaller screens */
+  }
+
+  #searchContainer {
+    position: fixed !important; /* Fix the search bar at the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for centering */
+    width: 50%; /* Take up 90% of the width */
+    max-width: 350px; /* Maximum width of 375px */
+    max-height: 40px; /* Maximum height of 40px */
+    z-index: 10001; /* High z-index to appear above other elements */
+    pointer-events: auto; /* Allow interaction with the search bar */
+  }
+
+  #layerSelectContainer {
+    position: fixed !important; /* Fix the layer selector at the bottom */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for centering */
+    width: 50%; /* Take up 90% of the width */
+    max-width: 350px; /* Maximum width of 375px */
+    height: 40px;
+    z-index: 10001; /* High z-index to appear above other elements */
+    pointer-events: auto; /* Allow interaction with the layer selector */
+  }
+  #pinlayerSelect {
+    width: 100%; /* Full width of the container */
+    padding: 5px; /* Padding inside the dropdown */
+    font-size: 14px; /* Font size for the dropdown text */
   }
 
   #pinFormModal .modal-content {
@@ -437,15 +526,50 @@
   #layerButtons, #renameLayerBtn, #exportLayerBtn, #importLayerBtn, #deleteLayerBtn, #toggleAllUtovare {
     display: none; /* Hide buttons on smaller screens */
   }
+}
+
+/* Responsive styles for phone screens (320px to 375px) */
+@media (max-width: 375px) {
+  #searchContainer, #layerSelectContainer {
+    position:static; /* Static position for better layout on small screens */
+    top: 10px !important; /* Align at the top */
+    width: 48% !important; /* Each takes 48% of the width */
+    height: 40px !important; /* Consistent height */
+    z-index: 10001 !important; /* High z-index to appear above other elements */
+    pointer-events: auto !important; /* Allow interaction with the search bar */
+  }
 
   #searchContainer {
-    position: fixed; /* Fix the search bar at the bottom */
-    bottom: 10px; /* 10px from the bottom of the screen */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust for centering */
-    width: 90%; /* Take up 90% of the width */
-    max-width: 375px; /* Maximum width of 375px */
-    z-index: 10001; /* High z-index to appear above other elements */
+    left: 5px !important; /* Move 5px to the left (adjusted for margin) */
+    margin-right: 2% !important; /* Add a small gap between the two elements */
+  }
+
+  #layerSelectContainer {
+    right: 5px !important; /* Move 5px to the right (adjusted for margin) */
+  }
+
+  /* Adjust the search bar input */
+  #searchBar {
+    width: 100% !important; /* Full width of the container */
+    height: 100% !important; /* Match the container height */
+    padding: 5px !important; /* Padding inside the input */
+    font-size: 14px !important; /* Font size */
+    box-sizing: border-box !important; /* Include padding in width calculation */
+  }
+
+  /* Adjust the layer selector dropdown */
+  #pinLayerSelect {
+    width: 100% !important; /* Full width of the container */
+    height: 100% !important; /* Match the container height */
+    padding: 5px !important; /* Padding inside the dropdown */
+    font-size: 14px !important; /* Font size for the dropdown text */
+    box-sizing: border-box !important; /* Include padding in width calculation */
+  }
+
+  /* Map container adjustments */
+  #map {
+    height: calc(100vh - 60px) !important; /* Adjust height to account for search bar and layer selector */
+    margin-top: 60px !important; /* Add margin to avoid overlap with fixed elements */
   }
 }
 
@@ -458,6 +582,7 @@
 body, html {
   -webkit-touch-callout: none; /* Disable callout on long press */
   -webkit-user-select: none; /* Disable text selection */
+  user-select: none; /* Standard property for compatibility */
   -ms-touch-action: none; /* Disable default touch actions */
   touch-action: manipulation; /* Allow touch gestures */
 }
@@ -804,7 +929,11 @@ async function performLogin() {
 let vehicleLayer; // Declare globally
 
 async function initMapAndRealtime() {
-  const map = L.map("map", { center: [45.541, 10.211], zoom: 7 });
+  const map = L.map("map", {
+    center: [45.541, 10.211],
+    zoom: 7,
+    tap: true, // Enable touch gestures
+  });
   globalMap = map; // Make the map globally accessible
 
   const baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -818,7 +947,7 @@ async function initMapAndRealtime() {
   const customPinLayer = L.layerGroup(); // Layer for custom pins
   customPinLayer.addTo(map);
 
-  L.control.layers({ "Base Map": baseLayer }, { "Vehicles": vehicleLayer, "Custom Pins": customPinLayer }).addTo(map);
+  L.control.layers({ "Mapa": baseLayer }, { "Vozila": vehicleLayer, "Utovari": customPinLayer }).addTo(map);
 
   try {
     await performLogin(); // Perform login
@@ -880,7 +1009,7 @@ async function initMapAndRealtime() {
       item.addEventListener("click", function() {
         const pinId = item.getAttribute("data-pin-id");
         if (globalMap && customPinMarkers[pinId]) {
-          globalMap.setView(customPinMarkers[pinId].getLatLng(), 9); // Center map on the pin
+          globalMap.setView(customPinMarkers[pinId].getLatLng(), 12); // Center map on the pin
           customPinMarkers[pinId].openTooltip(); // Open the pin's tooltip
         }
       });
@@ -902,23 +1031,22 @@ function loadPinLayersFromDatabase() {
   firebase.database().ref("globalMapPinLayers").on("value", function(snapshot) {
     const data = snapshot.val();
     if (data) {
-      pinLayers = data; // Load existing layers
+      pinLayers = data;
     } else {
-      // Create a default layer if no data exists
-      const defaultLayer = { id: "layer_default", name: ". nedelja", pins: [] };
+      const defaultLayer = { id: "layer_default", name: "Default Layer", pins: [] };
       pinLayers = [defaultLayer];
       activePinLayerId = defaultLayer.id;
-      savePinLayersToDatabase(); // Save the default layer to the database
+      savePinLayersToDatabase();
     }
     if (!activePinLayerId) {
-      activePinLayerId = pinLayers[0].id; // Set the first layer as active if none is active
+      activePinLayerId = pinLayers[0].id;
     }
-    activePinLayer = pinLayers.find(layer => layer.id === activePinLayerId) || pinLayers[0];
-    customPins = activePinLayer.pins || []; // Load pins from the active layer
-    clearCustomPinMarkers(); // Clear existing markers
-    loadPinsToMap(); // Load pins onto the map
-    updateLayerSelectMenu(); // Update the layer selection dropdown
-    updatePinListMenu(); // Update the pin list menu
+    activePinLayer = pinLayers.find(layer => layer.id === activePinLayerId) || pinLayers[0]; // Set the active layer
+    customPins = activePinLayer.pins || [];
+    clearCustomPinMarkers();
+    loadPinsToMap();
+    updateLayerSelectMenu();
+    updatePinListMenu();
   });
 }
 loadPinLayersFromDatabase(); // Call the function to load layers on page load
@@ -952,44 +1080,62 @@ function updateLayerSelectMenu() {
 }
 updateLayerSelectMenu(); // Call the function to initialize the dropdown
 
+
 // Handle layer selection changes
-document.getElementById("pinLayerSelect").addEventListener("change", function(e) {
+document.getElementById("pinLayerSelect").addEventListener("change", function (e) {
+  console.log("Dropdown value changed:", e.target.value); // Debugging log
+
   if (e.target.value === "create_new") {
-    // Prompt the user to enter a name for the new layer
+    console.log("Create new layer option selected."); // Debugging log
+
     const layerName = prompt("Enter new layer name:");
     if (layerName) {
       const newLayerId = "layer_" + Date.now(); // Generate a unique ID for the new layer
-      const newLayer = { id: newLayerId, name: layerName, pins: [] };
-      pinLayers.push(newLayer); // Add the new layer to the list
-      activePinLayerId = newLayerId;
-      activePinLayer = newLayer;
+      const newLayer = { id: newLayerId, name: layerName, pins: [] }; // Create the new layer object
+      pinLayers.push(newLayer); // Add the new layer to the list of layers
+      activePinLayerId = newLayerId; // Set the new layer as the active layer
+      activePinLayer = newLayer; // Update the active layer reference
       savePinLayersToDatabase(); // Save the updated layers to the database
       updateLayerSelectMenu(); // Refresh the dropdown menu
-      clearCustomPinMarkers(); // Clear existing markers
-      customPins = activePinLayer.pins; // Load pins from the new layer
-      loadPinsToMap(); // Load pins onto the map
+      clearCustomPinMarkers(); // Clear any existing markers
+      customPins = activePinLayer.pins; // Set the pins for the new layer
+      loadPinsToMap(); // Load the pins onto the map
       showNotification("New layer created", "success"); // Notify the user
     } else {
-      // Revert to the previously active layer if no name is entered
+      console.log("No name entered for the new layer."); // Debugging log
+      // If no name is entered, reset the dropdown to the previously active layer
       document.getElementById("pinLayerSelect").value = activePinLayerId;
     }
   } else {
-    // Switch to the selected layer
+    console.log("Switching to an existing layer:", e.target.value); // Debugging log
+
+    // Handle switching to an existing layer
     activePinLayerId = e.target.value;
-    activePinLayer = pinLayers.find(layer => layer.id === activePinLayerId);
+    activePinLayer = pinLayers.find((layer) => layer.id === activePinLayerId); // Find the selected layer
     clearCustomPinMarkers(); // Clear existing markers
-    customPins = activePinLayer.pins; // Load pins from the selected layer
-    loadPinsToMap(); // Load pins onto the map
+    customPins = activePinLayer.pins; // Set the pins for the selected layer
+    loadPinsToMap(); // Load the pins onto the map
   }
 });
 
 // Rename the currently active layer
 document.getElementById("renameLayerBtn").addEventListener("click", function() {
+  if (!activePinLayer) {
+    alert("No active layer selected.");
+    return;
+  }
+
   const newName = prompt("Enter new name for the current layer:", activePinLayer.name);
   if (newName) {
-    activePinLayer.name = newName; // Update the layer name
-    savePinLayersToDatabase(); // Save the updated layers to the database
-    updateLayerSelectMenu(); // Refresh the dropdown menu
+    activePinLayer.name = newName;
+    try {
+      savePinLayersToDatabase();
+      updateLayerSelectMenu();
+      alert("Layer renamed successfully.");
+    } catch (error) {
+      console.error("Error saving or updating layers:", error);
+      alert("Failed to rename the layer. Please try again.");
+    }
   }
 });
 
@@ -1108,11 +1254,11 @@ function getMarkerSize() {
 // Function to create a marker icon
 function createMarkerIcon(iconData, pinNumber) {
   const size = getMarkerSize();
-  const lighter = lightenColor(iconData.color, 20);
-  const darker = darkenColor(iconData.color, 20);
+  const lighter = lightenColor(iconData.color, 25);
+  const darker = darkenColor(iconData.color, 25);
   let inlineStyle = "background: " + iconData.color + "; background-image: linear-gradient(135deg, " 
                   + lighter + ", " + darker + "); width:" + size + "px; height:" + size 
-                  + "px; line-height:" + size + "px; text-align:center;";
+                  + "px; line-height: 16px" + "; text-align:center;";
   if (iconData.shape === "circle") {
     inlineStyle += "border-radius:" + (size / 2) + "px;";
   }
@@ -1317,7 +1463,7 @@ window.editPin = function(pinId) {
   const pin = customPins.find(item => item.id === pinId);
   if (pin) {
     currentEditingPinId = pinId;
-    document.getElementById("modalHeader").textContent = "Edit Custom Pin";
+    document.getElementById("modalHeader").textContent = "";
     document.getElementById("pinTitle").value = pin.title;
     document.getElementById("pinNumber").value = pin.number;
     document.getElementById("pinDescription").value = pin.description;
@@ -1461,7 +1607,7 @@ document.getElementById("savePinBtn").addEventListener("click", function() {
     return;
   }
   if (!activePinLayer) {
-    alert("No active layer available. Please reload the page.");
+    alert("No active layer selected.");
     return;
   }
 
@@ -1552,7 +1698,7 @@ searchBar.addEventListener("keyup", debounce(function() {
           li.addEventListener("click", function() {
             const lat = parseFloat(result.lat);
             const lon = parseFloat(result.lon);
-            globalMap.setView([lat, lon], 11);
+            globalMap.setView([lat, lon], 14);
             searchBar.value = "";
             searchResults.innerHTML = "";
             searchResults.style.display = "none";
@@ -1639,6 +1785,28 @@ resizer.addEventListener("dblclick", function(e) {
   if (newWidth > maxWidth) newWidth = maxWidth; // Enforce maximum width
   pinList.style.width = newWidth + "px"; // Apply the new width to the pin list
 }, false);
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("renameLayerBtn").addEventListener("click", function() {
+    if (!activePinLayer) {
+      alert("No active layer selected.");
+      return;
+    }
+
+    const newName = prompt("Enter new name for the current layer:", activePinLayer.name);
+    if (newName) {
+      activePinLayer.name = newName; // Update the layer name
+      try {
+        savePinLayersToDatabase(); // Save the updated layers to the database
+        updateLayerSelectMenu(); // Refresh the dropdown menu
+        alert("Layer renamed successfully.");
+      } catch (error) {
+        console.error("Error saving or updating layers:", error);
+        alert("Failed to rename the layer. Please try again.");
+      }
+    }
+  });
 });
 </script>
 </body>
