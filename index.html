@@ -529,19 +529,19 @@
 }
 
 /* Responsive styles for phone screens (320px to 375px) */
-@media (max-width: 375px) {
+@media (max-width: 390px) {
   #searchContainer, #layerSelectContainer {
     position:static; /* Static position for better layout on small screens */
     top: 10px !important; /* Align at the top */
     width: 48% !important; /* Each takes 48% of the width */
     height: 40px !important; /* Consistent height */
-    z-index: 10001 !important; /* High z-index to appear above other elements */
     pointer-events: auto !important; /* Allow interaction with the search bar */
   }
 
   #searchContainer {
     left: 5px !important; /* Move 5px to the left (adjusted for margin) */
     margin-right: 2% !important; /* Add a small gap between the two elements */
+    z-index: 10001 !important; /* High z-index to appear above other elements */
   }
 
   #layerSelectContainer {
