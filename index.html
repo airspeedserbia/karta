@@ -161,8 +161,8 @@
 /* Styling for the text content of the pin list item */
 .pin-text {
   flex: 1; /* Take up remaining space in the flex container */
-  white-space: pre-line; /* Preserve whitespace */
-  overflow: wrap; /* Hide overflowing text */
+  white-space: pre; /* Preserve whitespace */
+  overflow: hidden; /* Hide overflowing text */
   text-overflow: clip; /* Clip overflowing text */
 }
 
@@ -399,31 +399,12 @@
 
 /* Styling for tooltips */
 .custom-tooltip {
-  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-  color: #000; /* Black text */
-  font-size: 14px;
-  padding: 8px;
-  border: 1px solid #000; /* Black outline */
-  border-radius: 4px;
-  white-space: pre-line; /* Preserve 'Enter' line breaks */
-  text-align: left;
-  display: inline-block; /* Allow width adjustments */
+  background: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+  color: white; /* White text color */
+  padding: 5px; /* Padding inside the tooltip */
+  border-radius: 3px; /* Rounded corners */
+  font-size: 12px; /* Small font size */
 }
-/* Pin Name Styling */
-.custom-tooltip .pin-name {
-  font-weight: bold; /* Make pin name bold */
-  display: block; /* Ensure it stays in one line */
-  white-space: nowrap; /* Prevent wrapping */
-  overflow: hidden;
-}
-/* Pin Description Styling */
-.custom-tooltip .pin-description {
-  display: block; /* Ensure text is stacked below pin name */
-  white-space: pre-line; /* Preserve 'Enter' keyboard line breaks */
-  word-break: normal; /* Ensure natural line breaking */
-}
-  
-
 /* Context Menu Styling */
 .custom-context-menu {
   text-align: center; /* Center-align the text inside the context menu */
@@ -1317,19 +1298,6 @@ function updateTooltipPositions() {
       visibleMarkers.push(marker);
     }
   }
-  const tooltipHtml = `
-  <div class="custom-tooltip">
-    <div class="pin-name">${pin.title}</div>
-    <div class="pin-description">${pin.description}</div>
-  </div>
-`;
-
-marker.bindTooltip(tooltipHtml, {
-  permanent: true,
-  direction: "right",
-  offset: L.point(5,5),
-  className: "custom-tooltip"
-});
   const tooltips = [];
   visibleMarkers.forEach(marker => {
     const defaultOffset = L.point(13, -7);
