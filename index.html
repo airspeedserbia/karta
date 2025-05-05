@@ -1317,6 +1317,19 @@ function updateTooltipPositions() {
       visibleMarkers.push(marker);
     }
   }
+  const tooltipHtml = `
+  <div class="custom-tooltip">
+    <div class="pin-name">${pin.title}</div>
+    <div class="pin-description">${pin.description}</div>
+  </div>
+`;
+
+marker.bindTooltip(tooltipHtml, {
+  permanent: true,
+  direction: "right",
+  offset: L.point(5,5),
+  className: "custom-tooltip"
+});
   const tooltips = [];
   visibleMarkers.forEach(marker => {
     const defaultOffset = L.point(13, -7);
