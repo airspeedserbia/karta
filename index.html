@@ -1221,7 +1221,7 @@ function createMarkerIcon(iconData, pinNumber) {
   const darker = darkenColor(iconData.color, 25);
   let inlineStyle = "background: " + iconData.color + "; background-image: linear-gradient(135deg, " 
                   + lighter + ", " + darker + "); width:" + size + "px; height:" + size 
-                  + "px; line-height: 16px" + "; text-align:center;";
+                  + "px; line-height: 18px" + "; text-align:center;";
   if (iconData.shape === "circle") {
     inlineStyle += "border-radius:" + (size / 2) + "px;";
   }
